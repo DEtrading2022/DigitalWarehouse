@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="wock_sync_products"
+             instance="DigitalWarehouse\Wock\Cron\SyncProducts"
+             method="execute">
+            <config_path>wock/sync/products_cron_expr</config_path>
+        </job>
+        <job name="wock_sync_orders"
+             instance="DigitalWarehouse\Wock\Cron\SyncOrders"
+             method="execute">
+            <config_path>wock/sync/orders_cron_expr</config_path>
+        </job>
+    </group>
+</config>

@@ -1,0 +1,22 @@
+{
+    "name": "digitalwarehouse/module-wock",
+    "description": "Magento 2 integration module for World of CD Keys (WoCK) GraphQL API",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "require": {
+        "php": ">=8.1",
+        "magento/framework": ">=107.0",
+        "magento/module-store": "*",
+        "magento/module-backend": "*",
+        "magento/module-config": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "DigitalWarehouse\\Wock\\": ""
+        }
+    }
+}

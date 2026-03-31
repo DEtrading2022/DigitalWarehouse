@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- ── Dedicated logger: writes to var/log/wock.log ── -->
+    <virtualType name="DigitalWarehouse\Wock\Helper\Logger"
+                 type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">WoCK</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="object">DigitalWarehouse\Wock\Helper\LogHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- ── Service interfaces ── -->
+    <preference for="DigitalWarehouse\Wock\Api\TokenManagerInterface"
+                type="DigitalWarehouse\Wock\Model\Token\Manager"/>
+    <preference for="DigitalWarehouse\Wock\Api\ProductServiceInterface"
+                type="DigitalWarehouse\Wock\Model\Api\ProductService"/>
+    <preference for="DigitalWarehouse\Wock\Api\OrderServiceInterface"
+                type="DigitalWarehouse\Wock\Model\Api\OrderService"/>
+    <preference for="DigitalWarehouse\Wock\Api\DeliveryServiceInterface"
+                type="DigitalWarehouse\Wock\Model\Api\DeliveryService"/>
+    <preference for="DigitalWarehouse\Wock\Api\PartnerServiceInterface"
+                type="DigitalWarehouse\Wock\Model\Api\PartnerService"/>
+
+    <!-- ── Inject WoCK logger into all key classes ── -->
+    <type name="DigitalWarehouse\Wock\Model\Token\Manager">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Model\Api\Client">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Controller\Webhook\Product">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Controller\Webhook\Delivery">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Observer\ProductWebhookObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Observer\DeliveryWebhookObserver">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Cron\SyncProducts">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Cron\SyncOrders">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+
+    <!-- ── Console commands ── -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="wock_sync_products"   xsi:type="object">DigitalWarehouse\Wock\Console\Command\SyncProducts</item>
+                <item name="wock_sync_orders"     xsi:type="object">DigitalWarehouse\Wock\Console\Command\SyncOrders</item>
+                <item name="wock_test_connection" xsi:type="object">DigitalWarehouse\Wock\Console\Command\TestConnection</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

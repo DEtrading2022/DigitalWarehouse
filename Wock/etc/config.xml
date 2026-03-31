@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <wock>
+            <general>
+                <enabled>0</enabled>
+                <environment>sandbox</environment>
+                <sandbox_endpoint>https://api.stage.wock.digitalwarehou.se/graphql</sandbox_endpoint>
+                <production_endpoint>https://api.worldofcdkeys.com/graphql</production_endpoint>
+                <token_ttl>300</token_ttl>
+            </general>
+            <auth>
+                <token_url></token_url>
+                <tenant_id></tenant_id>
+                <client_id></client_id>
+                <client_secret></client_secret>
+                <scope></scope>
+            </auth>
+            <sync>
+                <products_cron_enabled>1</products_cron_enabled>
+                <products_cron_expr>*/5 * * * *</products_cron_expr>
+                <orders_cron_enabled>1</orders_cron_enabled>
+                <orders_cron_expr>*/10 * * * *</orders_cron_expr>
+                <page_size>100</page_size>
+            </sync>
+            <webhook>
+                <secret_header_name>X-Webhook-Secret</secret_header_name>
+                <secret_header_value></secret_header_value>
+            </webhook>
+        </wock>
+    </default>
+</config>

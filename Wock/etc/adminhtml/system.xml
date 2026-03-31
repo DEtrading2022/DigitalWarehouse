@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="digitalwarehouse" translate="label" sortOrder="200">
+            <label>Digital Warehouse</label>
+        </tab>
+        <section id="wock" translate="label" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>WoCK – World of CD Keys</label>
+            <tab>digitalwarehouse</tab>
+            <resource>DigitalWarehouse_Wock::config</resource>
+
+            <!-- General -->
+            <group id="general" translate="label" sortOrder="10" showInDefault="1">
+                <label>General Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="environment" translate="label" type="select" sortOrder="20" showInDefault="1">
+                    <label>Environment</label>
+                    <source_model>DigitalWarehouse\Wock\Model\Config\Source\Environment</source_model>
+                </field>
+                <field id="sandbox_endpoint" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                    <label>Sandbox GraphQL Endpoint</label>
+                    <comment>Default: https://api.stage.wock.digitalwarehou.se/graphql</comment>
+                </field>
+                <field id="production_endpoint" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+                    <label>Production GraphQL Endpoint</label>
+                    <comment>Default: https://api.worldofcdkeys.com/graphql</comment>
+                </field>
+                <field id="token_ttl" translate="label comment" type="text" sortOrder="50" showInDefault="1">
+                    <label>Token Cache TTL (seconds)</label>
+                    <comment>WoCK tokens are valid for 360 seconds. Default: 300</comment>
+                    <validate>validate-number validate-greater-than-zero</validate>
+                </field>
+            </group>
+
+            <!-- Authentication -->
+            <group id="auth" translate="label" sortOrder="20" showInDefault="1">
+                <label>Azure AD Authentication</label>
+                <field id="token_url" translate="label comment" type="text" sortOrder="10" showInDefault="1">
+                    <label>Access Token URL</label>
+                    <comment>Azure AD token endpoint, e.g. https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token</comment>
+                </field>
+                <field id="tenant_id" translate="label" type="text" sortOrder="20" showInDefault="1">
+                    <label>Tenant ID</label>
+                </field>
+                <field id="client_id" translate="label" type="text" sortOrder="30" showInDefault="1">
+                    <label>Client ID</label>
+                </field>
+                <field id="client_secret" translate="label" type="obscure" sortOrder="40" showInDefault="1">
+                    <label>Client Secret</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="scope" translate="label comment" type="text" sortOrder="50" showInDefault="1">
+                    <label>Scope</label>
+                    <comment>OAuth2 scope provided by WoCK helpdesk</comment>
+                </field>
+            </group>
+
+            <!-- Sync -->
+            <group id="sync" translate="label" sortOrder="30" showInDefault="1">
+                <label>Synchronisation</label>
+                <field id="products_cron_enabled" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Enable Product Sync Cron</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="products_cron_expr" translate="label comment" type="text" sortOrder="20" showInDefault="1">
+                    <label>Product Sync Cron Expression</label>
+                    <comment>Default: every 5 minutes (*/5 * * * *)</comment>
+                </field>
+                <field id="orders_cron_enabled" translate="label" type="select" sortOrder="30" showInDefault="1">
+                    <label>Enable Order Sync Cron</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="orders_cron_expr" translate="label comment" type="text" sortOrder="40" showInDefault="1">
+                    <label>Order Sync Cron Expression</label>
+                    <comment>Default: every 10 minutes (*/10 * * * *)</comment>
+                </field>
+                <field id="page_size" translate="label comment" type="text" sortOrder="50" showInDefault="1">
+                    <label>Page Size</label>
+                    <comment>Number of items per API page request. Default: 100</comment>
+                    <validate>validate-number validate-greater-than-zero</validate>
+                </field>
+            </group>
+
+            <!-- Webhooks -->
+            <group id="webhook" translate="label" sortOrder="40" showInDefault="1">
+                <label>Webhooks</label>
+                <field id="secret_header_name" translate="label comment" type="text" sortOrder="10" showInDefault="1">
+                    <label>Secret Header Name</label>
+                    <comment>HTTP header name used to authenticate incoming webhooks</comment>
+                </field>
+                <field id="secret_header_value" translate="label comment" type="obscure" sortOrder="20" showInDefault="1">
+                    <label>Secret Header Value</label>
+                    <comment>Value that must match the incoming header to accept webhook requests</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="product_webhook_url" translate="label comment" type="label" sortOrder="30" showInDefault="1">
+                    <label>Product Webhook URL</label>
+                    <comment><![CDATA[Register this URL in WoCK: <strong>{base_url}wock/webhook/product</strong>]]></comment>
+                </field>
+                <field id="delivery_webhook_url" translate="label comment" type="label" sortOrder="40" showInDefault="1">
+                    <label>Delivery Webhook URL</label>
+                    <comment><![CDATA[Register this URL in WoCK: <strong>{base_url}wock/webhook/delivery</strong>]]></comment>
+                </field>
+            </group>
+
+        </section>
+    </system>
+</config>

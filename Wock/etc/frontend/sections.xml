@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    Prevents Magento's customer-section invalidation mechanism from
+    triggering on the WoCK webhook POST endpoints (they are server-to-server
+    calls and must not invalidate any frontend session data).
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="wock/webhook/product">
+        <section name="cart"/>
+    </action>
+    <action name="wock/webhook/delivery">
+        <section name="cart"/>
+    </action>
+</config>
