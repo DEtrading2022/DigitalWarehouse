@@ -127,4 +127,22 @@ class ProductService implements ProductServiceInterface
 
         return $this->getAllProducts($where);
     }
+
+    public function getProductsByIdsAndUpdatedSince(array $ids, \DateTimeInterface $since): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $where = [
+            'id' => [
+                'in' => array_map('intval', $ids),
+            ],
+            'lastUpdateDateTime' => [
+                'gt' => $since->format(\DateTimeInterface::ATOM),
+            ],
+        ];
+
+        return $this->getAllProducts($where);
+    }
 }

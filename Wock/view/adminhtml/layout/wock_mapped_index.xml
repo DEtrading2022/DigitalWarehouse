@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="DigitalWarehouse\Wock\Block\Adminhtml\Mapped\Grid" name="wock_mapped_grid" template="DigitalWarehouse_Wock::mapped_grid.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

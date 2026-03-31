@@ -6,6 +6,8 @@ namespace DigitalWarehouse\Wock\Observer;
 
 use DigitalWarehouse\Wock\Api\DeliveryServiceInterface;
 use DigitalWarehouse\Wock\Exception\ApiException;
+use DigitalWarehouse\Wock\Model\OrderMap;
+use DigitalWarehouse\Wock\Model\SyncLog;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
@@ -25,6 +27,8 @@ class DeliveryWebhookObserver implements ObserverInterface
 {
     public function __construct(
         private readonly DeliveryServiceInterface $deliveryService,
+        private readonly OrderMap                 $orderMap,
+        private readonly SyncLog                  $syncLog,
         private readonly LoggerInterface          $logger,
     ) {}
 
@@ -36,6 +40,12 @@ class DeliveryWebhookObserver implements ObserverInterface
             return;
         }
 
+        // Update order map status to reflect that delivery was signalled
+        $mapping = $this->orderMap->getByWockOrderId($orderId);
+        if ($mapping) {
+            $this->orderMap->updateStatus($orderId, 'ready');
+        }
+
         try {
             $delivery = $this->deliveryService->getDelivery($orderId);
         } catch (ApiException $e) {
@@ -43,6 +53,7 @@ class DeliveryWebhookObserver implements ObserverInterface
                 'order_id' => $orderId,
                 'error'    => $e->getMessage(),
             ]);
+            $this->syncLog->error('delivery', $orderId, 'webhook', $e->getMessage());
             return;
         }
 
@@ -55,18 +66,30 @@ class DeliveryWebhookObserver implements ObserverInterface
                     'order_id' => $orderId,
                     'error'    => $status['error'],
                 ]);
+                $this->syncLog->error('delivery', $orderId, 'webhook', $status['error']);
+                if ($mapping) {
+                    $this->orderMap->updateStatus($orderId, 'error');
+                }
             } else {
                 $this->logger->info('WoCK: delivery not yet ready, will retry via polling', [
                     'order_id' => $orderId,
                 ]);
+                $this->syncLog->skipped('delivery', $orderId, 'webhook', 'Not ready yet — will retry via polling');
             }
             return;
         }
 
+        $productCount = count($delivery['products'] ?? []);
+
         $this->logger->info('WoCK: delivery ready, processing keys', [
             'order_id'      => $orderId,
-            'product_count' => count($delivery['products'] ?? []),
+            'product_count' => $productCount,
         ]);
+
+        $this->syncLog->success('delivery', $orderId, 'webhook', sprintf(
+            'Delivery ready with %d products',
+            $productCount
+        ));
 
         // TODO: Deliver keys to the customer order.
         //
@@ -80,5 +103,8 @@ class DeliveryWebhookObserver implements ObserverInterface
         //         $this->keyFulfillment->fulfil($orderId, $product, $key);
         //     }
         // }
+        //
+        // After successful fulfilment:
+        // $this->orderMap->updateStatus($orderId, 'fulfilled');
     }
 }

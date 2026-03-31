@@ -8,6 +8,8 @@ use DigitalWarehouse\Wock\Api\DeliveryServiceInterface;
 use DigitalWarehouse\Wock\Api\OrderServiceInterface;
 use DigitalWarehouse\Wock\Exception\ApiException;
 use DigitalWarehouse\Wock\Model\Config;
+use DigitalWarehouse\Wock\Model\OrderMap;
+use DigitalWarehouse\Wock\Model\SyncLog;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -26,6 +28,8 @@ class SyncOrders
         private readonly Config                   $config,
         private readonly OrderServiceInterface    $orderService,
         private readonly DeliveryServiceInterface $deliveryService,
+        private readonly OrderMap                 $orderMap,
+        private readonly SyncLog                  $syncLog,
         private readonly LoggerInterface          $logger,
     ) {}
 
@@ -45,6 +49,7 @@ class SyncOrders
             $this->logger->error('WoCK SyncOrders: failed to fetch orders', [
                 'error' => $e->getMessage(),
             ]);
+            $this->syncLog->error('order', null, 'poll', $e->getMessage());
             return;
         }
 
@@ -53,6 +58,8 @@ class SyncOrders
         foreach ($orders as $order) {
             $this->processOrder($order);
         }
+
+        $this->syncLog->success('order', null, 'poll', sprintf('Polled %d ready orders', count($orders)));
     }
 
     private function processOrder(array $order): void
@@ -64,6 +71,12 @@ class SyncOrders
             return;
         }
 
+        // Update OrderMap status if it exists
+        $mapping = $this->orderMap->getByWockOrderId($orderId);
+        if ($mapping) {
+            $this->orderMap->updateStatus($orderId, 'ready');
+        }
+
         try {
             $delivery = $this->deliveryService->getDelivery($orderId);
         } catch (ApiException $e) {
@@ -71,6 +84,7 @@ class SyncOrders
                 'order_id' => $orderId,
                 'error'    => $e->getMessage(),
             ]);
+            $this->syncLog->error('delivery', $orderId, 'fetch', $e->getMessage());
             return;
         }
 
@@ -82,6 +96,10 @@ class SyncOrders
                     'order_id' => $orderId,
                     'error'    => $status['error'],
                 ]);
+                $this->syncLog->error('delivery', $orderId, 'fetch', $status['error']);
+                if ($mapping) {
+                    $this->orderMap->updateStatus($orderId, 'error');
+                }
             } else {
                 $this->logger->debug('WoCK SyncOrders: delivery not ready yet', [
                     'order_id' => $orderId,
@@ -91,9 +109,9 @@ class SyncOrders
         }
 
         $this->logger->info('WoCK SyncOrders: delivery ready, processing', [
-            'order_id'        => $orderId,
+            'order_id'         => $orderId,
             'partner_order_id' => $partnerOrderId,
-            'product_count'   => count($delivery['products'] ?? []),
+            'product_count'    => count($delivery['products'] ?? []),
         ]);
 
         $this->fulfillDelivery($orderId, $partnerOrderId, $delivery);
@@ -116,6 +134,8 @@ class SyncOrders
      */
     private function fulfillDelivery(string $wockOrderId, string $partnerOrderId, array $delivery): void
     {
+        $keyCount = 0;
+
         foreach ($delivery['products'] as $product) {
             $productId      = $product['details']['id']   ?? null;
             $productName    = $product['details']['name'] ?? '';
@@ -126,24 +146,35 @@ class SyncOrders
                 $mimeType = $key['mimeType'];
 
                 $this->logger->debug('WoCK SyncOrders: key ready', [
-                    'order_id'   => $wockOrderId,
-                    'product_id' => $productId,
-                    'mime_type'  => $mimeType,
+                    'order_id'    => $wockOrderId,
+                    'product_id'  => $productId,
+                    'mime_type'   => $mimeType,
                     'has_subkeys' => !empty($key['subKeys']),
                 ]);
+
+                $keyCount++;
 
                 // TODO: $this->keyFulfillment->deliver($partnerOrderId, $partnerProdId, $key);
 
                 // Handle subKeys (DLC, bundles, dependent keys)
-                foreach ($key['subKeys'] as $subKey) {
+                foreach ($key['subKeys'] ?? [] as $subKey) {
                     $this->logger->debug('WoCK SyncOrders: sub-key ready', [
                         'order_id'   => $wockOrderId,
                         'product_id' => $productId,
                         'mime_type'  => $subKey['mimeType'],
                     ]);
+                    $keyCount++;
                     // TODO: $this->keyFulfillment->deliver($partnerOrderId, $partnerProdId, $subKey);
                 }
             }
         }
+
+        // Update order map status to fulfilled
+        $this->orderMap->updateStatus($wockOrderId, 'fulfilled');
+        $this->syncLog->success('delivery', $wockOrderId, 'fulfill', sprintf(
+            'Delivered %d keys for partner order %s',
+            $keyCount,
+            $partnerOrderId
+        ));
     }
 }

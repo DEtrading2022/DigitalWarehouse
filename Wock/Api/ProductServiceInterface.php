@@ -51,4 +51,14 @@ interface ProductServiceInterface
      * @throws ApiException
      */
     public function getProductsByIds(array $ids): array;
+
+    /**
+     * Fetch all products matching a specific list of IDs that have been updated since a specific time.
+     *
+     * @param int[] $ids
+     * @param \DateTimeInterface $since
+     * @return array<int, array<string, mixed>>
+     * @throws ApiException
+     */
+    public function getProductsByIdsAndUpdatedSince(array $ids, \DateTimeInterface $since): array;
 }

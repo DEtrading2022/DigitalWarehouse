@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system.xsd">
     <system>
         <tab id="digitalwarehouse" translate="label" sortOrder="200">
             <label>Digital Warehouse</label>
@@ -9,6 +9,15 @@
             <label>WoCK – World of CD Keys</label>
             <tab>digitalwarehouse</tab>
             <resource>DigitalWarehouse_Wock::config</resource>
+
+            <!-- Tools -->
+            <group id="tools" translate="label" sortOrder="5" showInDefault="1">
+                <label>Tools &amp; Utilities</label>
+                <field id="view_mapped" translate="label" type="button" sortOrder="10" showInDefault="1">
+                    <label>Mapped Products</label>
+                    <frontend_model>DigitalWarehouse\Wock\Block\Adminhtml\System\Config\Button</frontend_model>
+                </field>
+            </group>
 
             <!-- General -->
             <group id="general" translate="label" sortOrder="10" showInDefault="1">

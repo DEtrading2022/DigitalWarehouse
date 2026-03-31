@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- wock_sync_log: API sync / webhook activity log -->
+    <table name="wock_sync_log" resource="default" engine="innodb" comment="WoCK API sync / webhook activity log">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="varchar" name="entity_type" nullable="false" length="32" comment="Entity type: product | order | delivery | token"/>
+        <column xsi:type="varchar" name="entity_id" nullable="true" length="64" comment="WoCK entity ID (product int or order UUID)"/>
+        <column xsi:type="varchar" name="action" nullable="false" length="64" comment="Action: sync | webhook | create | delete | fetch | poll | fulfill"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="16" default="success" comment="success | error | skipped"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Optional detail / error message"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <index referenceId="WOCK_SYNC_LOG_ENTITY_TYPE_ACTION" indexType="btree">
+            <column name="entity_type"/>
+            <column name="action"/>
+        </index>
+        <index referenceId="WOCK_SYNC_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <!-- wock_order_map: Magento ↔ WoCK order cross-reference -->
+    <table name="wock_order_map" resource="default" engine="innodb" comment="Magento to WoCK order cross-reference">
+        <column xsi:type="int" name="map_id" unsigned="true" nullable="false" identity="true" comment="Map ID"/>
+        <column xsi:type="int" name="magento_order_id" unsigned="true" nullable="false" comment="Magento sales_order.entity_id"/>
+        <column xsi:type="varchar" name="magento_order_increment_id" nullable="false" length="32" comment="Magento order increment ID"/>
+        <column xsi:type="varchar" name="wock_order_id" nullable="false" length="36" comment="WoCK order UUID"/>
+        <column xsi:type="varchar" name="wock_partner_order_id" nullable="true" length="50" comment="WoCK partnerOrderId (your reference sent to WoCK)"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="32" default="pending" comment="pending | ready | fulfilled | cancelled | error"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="map_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="WOCK_ORDER_MAP_MAGENTO_ORDER_ID">
+            <column name="magento_order_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="WOCK_ORDER_MAP_WOCK_ORDER_ID">
+            <column name="wock_order_id"/>
+        </constraint>
+        <index referenceId="WOCK_ORDER_MAP_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+    </table>
+
+</schema>

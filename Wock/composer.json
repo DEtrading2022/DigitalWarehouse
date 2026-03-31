@@ -9,7 +9,9 @@
         "magento/framework": ">=107.0",
         "magento/module-store": "*",
         "magento/module-backend": "*",
-        "magento/module-config": "*"
+        "magento/module-config": "*",
+        "magento/module-catalog": "*",
+        "magento/module-eav": "*"
     },
     "autoload": {
         "files": [

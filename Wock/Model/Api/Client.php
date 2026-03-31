@@ -8,7 +8,7 @@ use DigitalWarehouse\Wock\Api\TokenManagerInterface;
 use DigitalWarehouse\Wock\Exception\ApiException;
 use DigitalWarehouse\Wock\Exception\AuthenticationException;
 use DigitalWarehouse\Wock\Model\Config;
-use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\HTTP\Client\CurlFactory;
 use Magento\Framework\Serialize\Serializer\Json;
 use Psr\Log\LoggerInterface;
 
@@ -16,13 +16,15 @@ use Psr\Log\LoggerInterface;
  * Low-level GraphQL HTTP client.
  *
  * Handles token injection, error parsing, and JSON (de)serialisation.
+ * Uses CurlFactory to create a fresh Curl instance per request,
+ * preventing header leakage across sequential API calls.
  */
 class Client
 {
     public function __construct(
         private readonly Config                $config,
         private readonly TokenManagerInterface $tokenManager,
-        private readonly Curl                  $curl,
+        private readonly CurlFactory           $curlFactory,
         private readonly Json                  $json,
         private readonly LoggerInterface       $logger,
     ) {}
@@ -47,22 +49,29 @@ class Client
             'variables' => $variables,
         ]);
 
-        $this->curl->setTimeout(30);
-        $this->curl->addHeader('Content-Type', 'application/json');
-        $this->curl->addHeader('Authorization', 'Bearer ' . $token);
-        $this->curl->post($endpoint, $payload);
+        $curl = $this->curlFactory->create();
+        $curl->setTimeout(30);
+        $curl->addHeader('Content-Type', 'application/json');
+        $curl->addHeader('Authorization', 'Bearer ' . $token);
+        $curl->post($endpoint, $payload);
 
-        $statusCode = (int) $this->curl->getStatus();
-        $body       = $this->curl->getBody();
+        $statusCode = (int) $curl->getStatus();
+        $body       = $curl->getBody();
 
         // Token might have expired mid-request; retry once with a fresh token
         if ($statusCode === 401) {
             $this->logger->warning('WoCK: received 401, refreshing token and retrying');
             $token = $this->tokenManager->refreshToken();
-            $this->curl->addHeader('Authorization', 'Bearer ' . $token);
-            $this->curl->post($endpoint, $payload);
-            $statusCode = (int) $this->curl->getStatus();
-            $body       = $this->curl->getBody();
+
+            // Create a fresh Curl instance for the retry
+            $curl = $this->curlFactory->create();
+            $curl->setTimeout(30);
+            $curl->addHeader('Content-Type', 'application/json');
+            $curl->addHeader('Authorization', 'Bearer ' . $token);
+            $curl->post($endpoint, $payload);
+
+            $statusCode = (int) $curl->getStatus();
+            $body       = $curl->getBody();
         }
 
         if ($statusCode >= 500) {

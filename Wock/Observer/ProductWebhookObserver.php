@@ -6,6 +6,7 @@ namespace DigitalWarehouse\Wock\Observer;
 
 use DigitalWarehouse\Wock\Api\ProductServiceInterface;
 use DigitalWarehouse\Wock\Exception\ApiException;
+use DigitalWarehouse\Wock\Model\SyncLog;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Psr\Log\LoggerInterface;
@@ -24,6 +25,7 @@ class ProductWebhookObserver implements ObserverInterface
 {
     public function __construct(
         private readonly ProductServiceInterface $productService,
+        private readonly SyncLog                 $syncLog,
         private readonly LoggerInterface         $logger,
     ) {}
 
@@ -36,9 +38,12 @@ class ProductWebhookObserver implements ObserverInterface
             return;
         }
 
+        $productIdStr = (string) $productId;
+
         if ($type === 'PRODUCT_DELETED') {
             // Product removed from platform — handle deletion in your own logic
             $this->logger->info('WoCK: product deleted on platform', ['product_id' => $productId]);
+            $this->syncLog->success('product', $productIdStr, 'webhook', 'Product deleted on WoCK platform');
             // TODO: disable / delete the corresponding Magento product
             return;
         }
@@ -51,11 +56,13 @@ class ProductWebhookObserver implements ObserverInterface
                 'product_id' => $productId,
                 'error'      => $e->getMessage(),
             ]);
+            $this->syncLog->error('product', $productIdStr, 'webhook', $e->getMessage());
             return;
         }
 
         if (empty($products)) {
             $this->logger->warning('WoCK: re-fetch returned no product', ['product_id' => $productId]);
+            $this->syncLog->skipped('product', $productIdStr, 'webhook', 'API returned empty result');
             return;
         }
 
@@ -65,6 +72,12 @@ class ProductWebhookObserver implements ObserverInterface
             'product_id' => $productId,
             'name'       => $product['name'] ?? '',
         ]);
+
+        $this->syncLog->success('product', $productIdStr, 'webhook', sprintf(
+            '%s refreshed | stock: %d',
+            $product['name'] ?? '',
+            $product['quantity']['all'] ?? 0
+        ));
 
         // TODO: Persist $product into your Magento catalogue or custom table.
         // Example: update stock quantity, price, disabled status, etc.

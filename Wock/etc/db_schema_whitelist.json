@@ -1,0 +1,26 @@
+{
+    "wock_sync_log": {
+        "log_id": true,
+        "entity_type": true,
+        "entity_id": true,
+        "action": true,
+        "status": true,
+        "message": true,
+        "created_at": true,
+        "WOCK_SYNC_LOG_ENTITY_TYPE_ACTION": true,
+        "WOCK_SYNC_LOG_CREATED_AT": true
+    },
+    "wock_order_map": {
+        "map_id": true,
+        "magento_order_id": true,
+        "magento_order_increment_id": true,
+        "wock_order_id": true,
+        "wock_partner_order_id": true,
+        "status": true,
+        "created_at": true,
+        "updated_at": true,
+        "WOCK_ORDER_MAP_MAGENTO_ORDER_ID": true,
+        "WOCK_ORDER_MAP_WOCK_ORDER_ID": true,
+        "WOCK_ORDER_MAP_STATUS": true
+    }
+}

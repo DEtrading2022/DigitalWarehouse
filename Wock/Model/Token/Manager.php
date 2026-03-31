@@ -8,7 +8,7 @@ use DigitalWarehouse\Wock\Api\TokenManagerInterface;
 use DigitalWarehouse\Wock\Exception\AuthenticationException;
 use DigitalWarehouse\Wock\Model\Config;
 use Magento\Framework\App\CacheInterface;
-use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\HTTP\Client\CurlFactory;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,7 +23,7 @@ class Manager implements TokenManagerInterface
 
     public function __construct(
         private readonly Config          $config,
-        private readonly Curl            $curl,
+        private readonly CurlFactory     $curlFactory,
         private readonly CacheInterface  $cache,
         private readonly LoggerInterface $logger,
     ) {}
@@ -67,12 +67,13 @@ class Manager implements TokenManagerInterface
         ];
 
         try {
-            $this->curl->setTimeout(15);
-            $this->curl->addHeader('Content-Type', 'application/x-www-form-urlencoded');
-            $this->curl->post($tokenUrl, $params);
+            $curl = $this->curlFactory->create();
+            $curl->setTimeout(15);
+            $curl->addHeader('Content-Type', 'application/x-www-form-urlencoded');
+            $curl->post($tokenUrl, $params);
 
-            $statusCode = (int) $this->curl->getStatus();
-            $body       = $this->curl->getBody();
+            $statusCode = (int) $curl->getStatus();
+            $body       = $curl->getBody();
         } catch (\Exception $e) {
             throw new AuthenticationException(
                 __('WoCK: Failed to reach token endpoint: %1', $e->getMessage()),

@@ -6,21 +6,15 @@ namespace DigitalWarehouse\Wock\Api;
 
 use DigitalWarehouse\Wock\Exception\ApiException;
 
+/**
+ * Retrieves partner account information from WoCK (credit line, balance, stock limits).
+ */
 interface PartnerServiceInterface
 {
     /**
-     * Retrieve the partner's financial balance and credit line.
+     * Fetch the authenticated partner's account details.
      *
-     * - `available` = Credit Line + Balance
-     * - `used`      = Already used funds
-     *
-     * @return array{
-     *     id: string,
-     *     available: string,
-     *     used: string,
-     *     partnerType: string,
-     *     stockLimit: int
-     * }
+     * @return array{id: string, available: string, used: string, partnerType: string, stockLimit: int|null}
      * @throws ApiException
      */
     public function getPartner(): array;

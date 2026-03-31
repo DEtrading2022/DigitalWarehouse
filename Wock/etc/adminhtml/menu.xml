@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="DigitalWarehouse_Wock::mapped_products"
+             title="Mapped WoCK Products"
+             module="DigitalWarehouse_Wock"
+             parent="Magento_Catalog::catalog"
+             sortOrder="200"
+             resource="DigitalWarehouse_Wock::config"
+             action="wock/mapped/index" />
+    </menu>
+</config>

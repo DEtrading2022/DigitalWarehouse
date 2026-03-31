@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DigitalWarehouse\Wock\Console\Command;
 
 use DigitalWarehouse\Wock\Cron\SyncProducts as SyncProductsCron;
+use DigitalWarehouse\Wock\Model\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,8 +18,7 @@ class SyncProducts extends Command
 {
     public function __construct(
         private readonly SyncProductsCron $syncProductsCron,
-        private readonly \DigitalWarehouse\Wock\Model\Config $config,
-        private readonly \Magento\Framework\App\CacheInterface $cache,
+        private readonly Config          $config,
     ) {
         parent::__construct();
     }
@@ -43,8 +43,8 @@ class SyncProducts extends Command
         }
 
         if ($input->getOption('full')) {
-            // Clear last-sync timestamp to force a full product load
-            $this->cache->remove('WOCK_PRODUCTS_LAST_SYNC');
+            // Clear last-sync timestamp via the cron class
+            $this->syncProductsCron->clearLastSync();
             $output->writeln('<info>Last-sync timestamp cleared — running full sync.</info>');
         }
 
