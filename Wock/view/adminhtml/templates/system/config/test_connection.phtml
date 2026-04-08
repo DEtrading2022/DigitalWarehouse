@@ -1,0 +1,35 @@
+<?php
+/** @var \DigitalWarehouse\Wock\Block\Adminhtml\System\Config\TestConnection $block */
+?>
+<div class="actions actions-wock-test-connection" id="wock_test_connection_container">
+    <?= $block->getButtonHtml() ?>
+    <span class="wock-test-result" style="display:inline-block; margin-left:10px; font-weight:bold;"></span>
+    <p class="note" style="margin-top: 5px;">
+        <span><?= $block->escapeHtml(__('Tests the Azure AD Connection and queries 1 product from the WoCK API to verify connection validity. Remember to Save Config first!')) ?></span>
+    </p>
+</div>
+
+<script>
+    require(['jquery'], function($){
+        $('#wock_test_connection_btn').click(function () {
+            var resultSpan = $('.wock-test-result');
+            resultSpan.css('color', '#eb5202').text('Testing connection... please wait');
+
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getAjaxUrl()) ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        resultSpan.css('color', '#008000').text('✅ Connection Successful! Detected endpoint: ' + response.message);
+                    } else {
+                        resultSpan.css('color', '#e22626').text('❌ Failed: ' + response.error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    resultSpan.css('color', '#e22626').text('❌ An unexpected server or routing error occurred.');
+                }
+            });
+        });
+    });
+</script>

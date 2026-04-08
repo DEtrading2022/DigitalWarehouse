@@ -66,6 +66,9 @@
                     <label>Scope</label>
                     <comment>OAuth2 scope provided by WoCK helpdesk</comment>
                 </field>
+                <field id="test_connection" translate="label" type="button" sortOrder="60" showInDefault="1">
+                    <frontend_model>DigitalWarehouse\Wock\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                </field>
             </group>
 
             <!-- Sync -->

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <!-- Fired when a product is received from WoCK webhook -->
+    <!-- Fired when a product webhook is received from WoCK -->
     <event name="wock_product_webhook_received">
         <observer name="wock_product_webhook_sync"
                   instance="DigitalWarehouse\Wock\Observer\ProductWebhookObserver"/>
     </event>
-    <!-- Fired when a delivery is received from WoCK webhook -->
+    <!-- Fired when a delivery webhook is received from WoCK -->
     <event name="wock_delivery_webhook_received">
         <observer name="wock_delivery_webhook_process"
                   instance="DigitalWarehouse\Wock\Observer\DeliveryWebhookObserver"/>

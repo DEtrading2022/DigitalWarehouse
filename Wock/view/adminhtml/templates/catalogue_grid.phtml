@@ -1,0 +1,132 @@
+<?php
+/**
+ * @var \DigitalWarehouse\Wock\Block\Adminhtml\Catalogue\Grid $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$apiData = $block->getApiData();
+$currentPage = $block->getCurrentPage();
+?>
+
+<div class="admin__data-grid-wrap wock-explorer">
+    <?php if (isset($apiData['error'])): ?>
+        <div class="message error empty">
+            <span><?= $escaper->escapeHtml($apiData['error']) ?></span>
+            <br/><br/>
+            <p>Go to <a href="<?= $escaper->escapeUrl($block->getUrl('adminhtml/system_config/edit/section/wock')) ?>">System -> Configuration -> Digital Warehouse -> WoCK</a> to resolve this.</p>
+        </div>
+    <?php else: ?>
+        <?php
+        $items = $apiData['items'] ?? [];
+        $totalCount = $apiData['totalCount'] ?? 0;
+        $hasNextPage = $apiData['pageInfo']['hasNextPage'] ?? false;
+        ?>
+
+        <div class="wock-grid-controls">
+            <span class="wock-counts">
+                <strong><?= $escaper->escapeHtml($totalCount) ?></strong> total products on WoCK API
+            </span>
+            <div class="wock-pagination">
+                <?php if ($currentPage > 1): ?>
+                    <button type="button" class="action-secondary" onclick="window.location.href='<?= $escaper->escapeUrl($block->getPaginationUrl($currentPage - 1)) ?>'">
+                        &laquo; <?= $escaper->escapeHtml(__('Previous Limit 50')) ?>
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="action-secondary disabled" disabled>
+                        &laquo; <?= $escaper->escapeHtml(__('Previous Limit 50')) ?>
+                    </button>
+                <?php endif; ?>
+
+                <span class="page-current">Page <?= $escaper->escapeHtml($currentPage) ?></span>
+
+                <?php if ($hasNextPage): ?>
+                    <button type="button" class="action-secondary" onclick="window.location.href='<?= $escaper->escapeUrl($block->getPaginationUrl($currentPage + 1)) ?>'">
+                        <?= $escaper->escapeHtml(__('Next Limit 50')) ?> &raquo;
+                    </button>
+                <?php else: ?>
+                    <button type="button" class="action-secondary disabled" disabled>
+                        <?= $escaper->escapeHtml(__('Next Limit 50')) ?> &raquo;
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php if (!empty($items)): ?>
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK ID')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product Name')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Stock')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Price')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Platform')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Language')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Region')) ?></span></th>
+                        <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Status')) ?></span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($items as $item): ?>
+                        <tr class="data-row <?= $item['isDisabled'] ? 'wock-row-disabled' : '' ?>">
+                            <td><strong><?= $escaper->escapeHtml($item['id']) ?></strong></td>
+                            <td class="wock-title"><?= $escaper->escapeHtml($item['name']) ?></td>
+                            <td><?= $escaper->escapeHtml($item['quantity']['all'] ?? 0) ?></td>
+                            <td>
+                                <?php
+                                $priceHtml = '—';
+                                if (!empty($item['bulkPrices'])) {
+                                    $priceHtml = '';
+                                    $currency = $escaper->escapeHtml($item['currency'] ?? '');
+                                    foreach ($item['bulkPrices'] as $bp) {
+                                        $qty = (int)$bp['minimumQuantity'];
+                                        $priceVal = number_format((float)$bp['price'], 2);
+                                        $priceHtml .= sprintf('<div style="white-space: nowrap;"><strong>%d+</strong>: %s %s</div>', $qty, $currency, $priceVal);
+                                    }
+                                }
+                                echo $priceHtml;
+                                ?>
+                            </td>
+                            <td><?= $escaper->escapeHtml($item['platform'] ?: '—') ?></td>
+                            <td><?= $escaper->escapeHtml($item['language'] ?: '—') ?></td>
+                            <td><?= $escaper->escapeHtml($item['region'] ?: '—') ?></td>
+                            <td>
+                                <?php if ($item['isDisabled']): ?>
+                                    <span class="wock-status-badge disabled">Disabled</span>
+                                <?php else: ?>
+                                    <span class="wock-status-badge active">Active</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <div class="message info empty">
+                <span><?= $escaper->escapeHtml(__('No active products found on the WoCK API.')) ?></span>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+<style>
+.wock-explorer { margin-top: 20px; border: 1px solid #d6d6d6; background-color: #fff; padding-bottom: 2rem;}
+.wock-explorer table { width: 100%; border-collapse: collapse; }
+.wock-explorer th, .wock-explorer th span { background: #f8f8f8; padding: 1.2rem 1rem; text-align: left; border-bottom: 2px solid #ccc; font-weight: 600; color: #000000 !important; }
+.wock-explorer td { padding: 1rem; border-bottom: 1px solid #e3e3e3; vertical-align: middle; color: #000000 !important; }
+.wock-explorer tr:hover td { background-color: #f5f5f5; }
+.wock-explorer .empty { padding: 2rem; margin: 0; border: none; }
+.wock-row-disabled td { color: #888; background-color: #fcfcfc;}
+.wock-title { font-weight: 500; }
+
+/* Status Badges */
+.wock-status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 1.1rem; font-weight: 600; }
+.wock-status-badge.active { background-color: #e5efe5; color: #006400; border: 1px solid #c5d9c5;}
+.wock-status-badge.disabled { background-color: #f9d4d4; color: #e22626; border: 1px solid #edc2c2;}
+
+/* Pagination Controls */
+.wock-grid-controls { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 1rem; border-bottom: 1px solid #e3e3e3; background: #fff;}
+.wock-counts strong { font-size: 1.4rem; color: #007bdb;}
+.wock-pagination { display: flex; align-items: center; gap: 10px; }
+.page-current { font-weight: 600; padding: 0 10px;}
+.wock-pagination button { cursor: pointer; }
+.wock-pagination button.disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
