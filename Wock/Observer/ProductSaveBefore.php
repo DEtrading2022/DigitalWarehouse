@@ -36,6 +36,11 @@ class ProductSaveBefore implements ObserverInterface
             return;
         }
 
+        // Only sync if the product is flagged as a WoCK product
+        if (!(int) $product->getData('is_wock_product')) {
+            return;
+        }
+
         $wockId = (int) $product->getData('wock_product_id');
 
         if (!$wockId) {

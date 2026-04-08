@@ -97,6 +97,21 @@
                 </field>
             </group>
 
+            <!-- Order Fulfillment -->
+            <group id="orders" translate="label" sortOrder="35" showInDefault="1">
+                <label>Order Fulfillment</label>
+                <field id="fulfillment_status" translate="label comment" type="select" sortOrder="10" showInDefault="1">
+                    <label>Fulfillment Order Status</label>
+                    <source_model>DigitalWarehouse\Wock\Model\Config\Source\OrderStatus</source_model>
+                    <comment><![CDATA[When a Magento order reaches this status, WoCK product keys will be retrieved from the API and emailed to the customer. Typical value: <strong>complete</strong>.]]></comment>
+                </field>
+                <field id="key_email_template" translate="label comment" type="select" sortOrder="20" showInDefault="1">
+                    <label>Product Keys Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Email template used to send product keys to the customer.</comment>
+                </field>
+            </group>
+
             <!-- Webhooks -->
             <group id="webhook" translate="label" sortOrder="40" showInDefault="1">
                 <label>Webhooks</label>

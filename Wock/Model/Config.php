@@ -31,6 +31,9 @@ class Config
     private const XML_PATH_WH_SECRET_NAME    = 'wock/webhook/secret_header_name';
     private const XML_PATH_WH_SECRET_VALUE   = 'wock/webhook/secret_header_value';
 
+    private const XML_PATH_FULFILL_STATUS    = 'wock/orders/fulfillment_status';
+    private const XML_PATH_KEY_EMAIL_TPL     = 'wock/orders/key_email_template';
+
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly EncryptorInterface   $encryptor,
@@ -106,6 +109,18 @@ class Config
     public function getPageSize(): int
     {
         return (int) $this->scopeConfig->getValue(self::XML_PATH_PAGE_SIZE) ?: 100;
+    }
+
+    // --- Order Fulfillment ---
+
+    public function getOrderFulfillmentStatus(): string
+    {
+        return (string) $this->scopeConfig->getValue(self::XML_PATH_FULFILL_STATUS);
+    }
+
+    public function getKeyEmailTemplate(): string
+    {
+        return (string) $this->scopeConfig->getValue(self::XML_PATH_KEY_EMAIL_TPL) ?: 'wock_order_keys_email';
     }
 
     // --- Webhook ---

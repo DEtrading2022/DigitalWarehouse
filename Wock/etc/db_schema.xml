@@ -47,4 +47,34 @@
         </index>
     </table>
 
+    <!-- wock_order_keys: per-item product keys for WoCK orders -->
+    <table name="wock_order_keys" resource="default" engine="innodb" comment="WoCK order product keys">
+        <column xsi:type="int"       name="key_id"                unsigned="true" nullable="false" identity="true" comment="Key ID"/>
+        <column xsi:type="int"       name="order_id"              unsigned="true" nullable="false" comment="Magento sales_order.entity_id"/>
+        <column xsi:type="varchar"   name="order_increment_id"    nullable="false" length="32"   comment="Magento order increment ID"/>
+        <column xsi:type="int"       name="order_item_id"         unsigned="true" nullable="false" comment="Magento sales_order_item.item_id"/>
+        <column xsi:type="int"       name="product_id"            unsigned="true" nullable="false" comment="Magento catalog_product_entity.entity_id"/>
+        <column xsi:type="varchar"   name="product_name"          nullable="true"  length="255"  comment="Magento product name snapshot"/>
+        <column xsi:type="int"       name="wock_product_id"       unsigned="true" nullable="false" comment="WoCK product ID"/>
+        <column xsi:type="smallint"  name="qty"                   unsigned="true" nullable="false" default="1" comment="Ordered quantity"/>
+        <column xsi:type="varchar"   name="product_key"           nullable="false" length="512"  comment="Product key (placeholder or actual)"/>
+        <column xsi:type="varchar"   name="wock_order_id"         nullable="true"  length="36"   comment="WoCK order UUID (once placed)"/>
+        <column xsi:type="smallint"  name="store_id"              unsigned="true" nullable="false" default="0" comment="Magento store ID"/>
+        <column xsi:type="varchar"   name="status"                nullable="false" length="24"   default="pending" comment="pending | fulfilled | error"/>
+        <column xsi:type="timestamp" name="created_at"            nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at"            nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="key_id"/>
+        </constraint>
+        <index referenceId="WOCK_ORDER_KEYS_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+        <index referenceId="WOCK_ORDER_KEYS_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+        <index referenceId="WOCK_ORDER_KEYS_WOCK_PRODUCT_ID" indexType="btree">
+            <column name="wock_product_id"/>
+        </index>
+    </table>
+
 </schema>

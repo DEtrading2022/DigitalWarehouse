@@ -22,5 +22,24 @@
         "WOCK_ORDER_MAP_MAGENTO_ORDER_ID": true,
         "WOCK_ORDER_MAP_WOCK_ORDER_ID": true,
         "WOCK_ORDER_MAP_STATUS": true
+    },
+    "wock_order_keys": {
+        "key_id": true,
+        "order_id": true,
+        "order_increment_id": true,
+        "order_item_id": true,
+        "product_id": true,
+        "product_name": true,
+        "wock_product_id": true,
+        "qty": true,
+        "product_key": true,
+        "wock_order_id": true,
+        "store_id": true,
+        "status": true,
+        "created_at": true,
+        "updated_at": true,
+        "WOCK_ORDER_KEYS_ORDER_ID": true,
+        "WOCK_ORDER_KEYS_STATUS": true,
+        "WOCK_ORDER_KEYS_WOCK_PRODUCT_ID": true
     }
 }

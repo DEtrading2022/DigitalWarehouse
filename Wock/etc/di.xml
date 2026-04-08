@@ -61,6 +61,21 @@
             <argument name="orderMap" xsi:type="object">DigitalWarehouse\Wock\Model\OrderMap</argument>
         </arguments>
     </type>
+    <type name="DigitalWarehouse\Wock\Observer\ProductSaveBefore">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Observer\OrderPlaceAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Observer\OrderStatusChange">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
     <type name="DigitalWarehouse\Wock\Cron\SyncProducts">
         <arguments>
             <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>

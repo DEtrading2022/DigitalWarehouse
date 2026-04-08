@@ -4,6 +4,7 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 $products = $block->getMappedProducts();
+$block->loadWockData($products);
 ?>
 
 <div class="admin__data-grid-wrap">
@@ -14,16 +15,21 @@ $products = $block->getMappedProducts();
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Magento Product ID')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Magento Name')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Product ID')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Product Name')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Product Price')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Platform')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Action')) ?></span></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($products as $item): ?>
+                    <?php $wockId = $item->getData('wock_product_id'); ?>
                     <tr class="data-row">
                         <td><?= $escaper->escapeHtml($item->getId()) ?></td>
                         <td><?= $escaper->escapeHtml($item->getName()) ?></td>
-                        <td><strong><?= $escaper->escapeHtml($item->getData('wock_product_id')) ?></strong></td>
+                        <td><strong><?= $escaper->escapeHtml($wockId) ?></strong></td>
+                        <td><?= $escaper->escapeHtml($block->getWockProductName($wockId)) ?></td>
+                        <td><?= $escaper->escapeHtml($block->getWockProductPrice($wockId)) ?></td>
                         <td><?= $escaper->escapeHtml($item->getData('wock_platform') ?: '—') ?></td>
                         <td>
                             <a href="<?= $escaper->escapeUrl($block->getUrl('catalog/product/edit', ['id' => $item->getId()])) ?>" class="action-menu-item">
@@ -52,3 +58,4 @@ $products = $block->getMappedProducts();
 .admin__data-grid-wrap .action-menu-item { color: #007bdb; text-decoration: none; font-weight: 600; }
 .admin__data-grid-wrap .action-menu-item:hover { text-decoration: underline; color: #00599d; }
 </style>
+

@@ -9,7 +9,15 @@
              sortOrder="200"
              resource="DigitalWarehouse_Wock::config"
              action="wock/mapped/index" />
-             
+
+        <add id="DigitalWarehouse_Wock::wock_orders"
+             title="WoCK Orders"
+             module="DigitalWarehouse_Wock"
+             parent="Magento_Catalog::catalog"
+             sortOrder="205"
+             resource="DigitalWarehouse_Wock::config"
+             action="wock/orders/index" />
+
         <add id="DigitalWarehouse_Wock::api_catalogue"
              title="WoCK API Explorer"
              module="DigitalWarehouse_Wock"

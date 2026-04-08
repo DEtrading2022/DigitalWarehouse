@@ -1,0 +1,49 @@
+<!--@subject Your Product Keys for Order #{{var increment_id}} @-->
+<!--@vars
+{"var increment_id":"Order Number","var customer_name":"Customer Name","var fulfilled_keys":"Fulfilled Keys Array","var store.getFrontendName()":"Store Name"}
+@-->
+
+{{template config_path="design/email/header_template"}}
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td style="padding: 20px 30px;">
+            <h1 style="font-size: 22px; font-weight: bold; color: #333; margin-bottom: 10px;">
+                {{trans "Your Product Keys Are Ready!"}}
+            </h1>
+            <p style="font-size: 14px; color: #555; margin-bottom: 20px;">
+                {{trans "Dear %customer_name," customer_name=$customer_name}}
+            </p>
+            <p style="font-size: 14px; color: #555; margin-bottom: 20px;">
+                {{trans "Thank you for your order <strong>#%increment_id</strong>. Your product keys are now available:" increment_id=$increment_id}}
+            </p>
+
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 20px;">
+                <thead>
+                    <tr style="background-color: #f5f5f5;">
+                        <th style="padding: 12px 15px; text-align: left; font-size: 13px; color: #333; border-bottom: 2px solid #ddd;">
+                            {{trans "Product"}}
+                        </th>
+                        <th style="padding: 12px 15px; text-align: center; font-size: 13px; color: #333; border-bottom: 2px solid #ddd;">
+                            {{trans "Qty"}}
+                        </th>
+                        <th style="padding: 12px 15px; text-align: left; font-size: 13px; color: #333; border-bottom: 2px solid #ddd;">
+                            {{trans "Product Key"}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{depend fulfilled_keys}}
+                    {{var fulfilled_keys}}
+                    {{/depend}}
+                </tbody>
+            </table>
+
+            <p style="font-size: 13px; color: #888; margin-top: 20px;">
+                {{trans "Please save your product keys in a safe place. If you have any questions, please don't hesitate to contact us."}}
+            </p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

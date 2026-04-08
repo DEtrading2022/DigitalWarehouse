@@ -28,6 +28,10 @@
                 <secret_header_name>X-Webhook-Secret</secret_header_name>
                 <secret_header_value></secret_header_value>
             </webhook>
+            <orders>
+                <fulfillment_status>complete</fulfillment_status>
+                <key_email_template>wock_order_keys_email</key_email_template>
+            </orders>
         </wock>
     </default>
 </config>

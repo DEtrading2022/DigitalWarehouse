@@ -11,4 +11,14 @@
         <observer name="wock_delivery_webhook_process"
                   instance="DigitalWarehouse\Wock\Observer\DeliveryWebhookObserver"/>
     </event>
+    <!-- Create placeholder WoCK keys when a Magento order is placed -->
+    <event name="sales_order_place_after">
+        <observer name="wock_order_place_after"
+                  instance="DigitalWarehouse\Wock\Observer\OrderPlaceAfter"/>
+    </event>
+    <!-- Fulfill WoCK keys when order status reaches configured fulfillment status -->
+    <event name="sales_order_save_after">
+        <observer name="wock_order_status_change"
+                  instance="DigitalWarehouse\Wock\Observer\OrderStatusChange"/>
+    </event>
 </config>

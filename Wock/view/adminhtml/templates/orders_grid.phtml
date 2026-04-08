@@ -1,0 +1,89 @@
+<?php
+/**
+ * @var \DigitalWarehouse\Wock\Block\Adminhtml\Orders\Grid $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$orderKeys = $block->getOrderKeys();
+?>
+
+<div class="wock-orders-grid-wrap">
+    <?php if (!empty($orderKeys)): ?>
+        <table class="data-grid">
+            <thead>
+                <tr>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Order #')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Store / Website')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product Name')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Product ID')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Qty')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product Key')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Status')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Created')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Action')) ?></span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($orderKeys as $row): ?>
+                    <tr class="data-row">
+                        <td>
+                            <a href="<?= $escaper->escapeUrl($block->getOrderViewUrl((int) $row['order_id'])) ?>"
+                               class="wock-link" title="<?= $escaper->escapeHtmlAttr(__('View Order')) ?>">
+                                <?= $escaper->escapeHtml($row['order_increment_id']) ?>
+                            </a>
+                        </td>
+                        <td><?= $escaper->escapeHtml($block->getStoreName((int) $row['store_id'])) ?></td>
+                        <td><?= $escaper->escapeHtml($row['product_name'] ?? '—') ?></td>
+                        <td><strong><?= $escaper->escapeHtml((string) $row['wock_product_id']) ?></strong></td>
+                        <td class="a-center"><?= $escaper->escapeHtml((string) $row['qty']) ?></td>
+                        <td class="wock-key-cell">
+                            <code class="wock-key-value"><?= $escaper->escapeHtml($row['product_key']) ?></code>
+                        </td>
+                        <td>
+                            <span class="wock-status-badge <?= $escaper->escapeHtmlAttr($block->getStatusClass($row['status'])) ?>">
+                                <?= $escaper->escapeHtml(ucfirst($row['status'])) ?>
+                            </span>
+                        </td>
+                        <td><?= $escaper->escapeHtml($row['created_at'] ?? '') ?></td>
+                        <td>
+                            <a href="<?= $escaper->escapeUrl($block->getOrderViewUrl((int) $row['order_id'])) ?>"
+                               class="action-menu-item">
+                                <?= $escaper->escapeHtml(__('View Order')) ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <div class="message info empty">
+            <span><?= $escaper->escapeHtml(__('No WoCK order keys found. Keys will appear here once customers order products with "Is WoCK Product" set to Yes.')) ?></span>
+        </div>
+    <?php endif; ?>
+</div>
+
+<style>
+.wock-orders-grid-wrap { margin-top: 20px; border: 1px solid #d6d6d6; background-color: #fff; }
+.wock-orders-grid-wrap table { width: 100%; border-collapse: collapse; }
+.wock-orders-grid-wrap th,
+.wock-orders-grid-wrap th span { background: #f8f8f8; padding: 1.2rem 1rem; text-align: left; border-bottom: 2px solid #ccc; font-weight: 600; color: #000000 !important; }
+.wock-orders-grid-wrap td { padding: 1rem; border-bottom: 1px solid #e3e3e3; vertical-align: middle; color: #000000 !important; }
+.wock-orders-grid-wrap tr:hover td { background-color: #f5f5f5; }
+.wock-orders-grid-wrap .empty { padding: 2rem; }
+.wock-orders-grid-wrap .a-center { text-align: center; }
+
+/* Links */
+.wock-orders-grid-wrap .wock-link { color: #007bdb; text-decoration: none; font-weight: 600; }
+.wock-orders-grid-wrap .wock-link:hover { text-decoration: underline; color: #00599d; }
+.wock-orders-grid-wrap .action-menu-item { color: #007bdb; text-decoration: none; font-weight: 600; }
+.wock-orders-grid-wrap .action-menu-item:hover { text-decoration: underline; color: #00599d; }
+
+/* Key cell */
+.wock-key-cell { max-width: 280px; word-break: break-all; }
+.wock-key-value { background: #f4f4f4; border: 1px solid #ddd; padding: 3px 8px; border-radius: 3px; font-size: 12px; color: #333; }
+
+/* Status badges */
+.wock-status-badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.wock-status-pending   { background-color: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+.wock-status-fulfilled { background-color: #d4edda; color: #155724; border: 1px solid #28a745; }
+.wock-status-error     { background-color: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+</style>
