@@ -247,6 +247,16 @@ class OrderStatusChange implements ObserverInterface
                 return;
             }
 
+            // Generate HTML for the fulfilled keys since M2 email templates don't natively loop arrays
+            $keysHtml = '';
+            foreach ($fulfilledKeys as $keyData) {
+                $keysHtml .= '<tr>';
+                $keysHtml .= '<td style="padding: 12px 15px; border-bottom: 1px solid #eee;">' . htmlspecialchars((string) $keyData['product_name']) . '</td>';
+                $keysHtml .= '<td style="padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee;">' . (int) $keyData['qty'] . '</td>';
+                $keysHtml .= '<td style="padding: 12px 15px; border-bottom: 1px solid #eee; font-family: monospace; background: #fafafa;"><strong>' . htmlspecialchars((string) $keyData['product_key']) . '</strong></td>';
+                $keysHtml .= '</tr>';
+            }
+
             $senderIdentity = $this->scopeConfig->getValue(
                 'trans_email/ident_sales/email',
                 ScopeInterface::SCOPE_STORE,
@@ -263,7 +273,7 @@ class OrderStatusChange implements ObserverInterface
                     'order'          => $order,
                     'increment_id'   => $order->getIncrementId(),
                     'customer_name'  => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
-                    'fulfilled_keys' => $fulfilledKeys,
+                    'keys_html'      => $keysHtml, // Used directly in the email template
                     'store'          => $this->storeManager->getStore($storeId),
                 ])
                 ->setFromByScope($senderIdentity, $storeId)
