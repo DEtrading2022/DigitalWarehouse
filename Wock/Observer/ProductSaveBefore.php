@@ -96,23 +96,22 @@ class ProductSaveBefore implements ObserverInterface
                 'is_in_stock' => $stockQty > 0 ? 1 : 0,
             ]);
 
-            // Also push directly into the stock item for existing products
-            if ($product->getId()) {
-                try {
-                    $stockItem = $this->stockRegistry->getStockItem(
-                        $product->getId(),
-                        $product->getStore()->getWebsiteId()
-                    );
-                    $stockItem->setQty($stockQty);
-                    $stockItem->setIsInStock($stockQty > 0);
-                    $stockItem->setManageStock(1);
-                    $stockItem->setUseConfigManageStock(0);
-                } catch (\Exception $e) {
-                    $this->logger->warning('WoCK ProductSaveBefore: could not update stock item', [
-                        'wock_id' => $wockId,
-                        'error'   => $e->getMessage(),
-                    ]);
-                }
+            // Ensure stock is updated via standard Magento methods
+            $product->setStockData([
+                'qty'                     => $stockQty,
+                'is_in_stock'             => $stockQty > 0 ? 1 : 0,
+                'manage_stock'            => 1,
+                'use_config_manage_stock' => 0,
+            ]);
+
+            // If extension attributes exist, update the linked stock item instance
+            $extensionAttributes = $product->getExtensionAttributes();
+            if ($extensionAttributes && $extensionAttributes->getStockItem()) {
+                $stockItem = $extensionAttributes->getStockItem();
+                $stockItem->setQty($stockQty);
+                $stockItem->setIsInStock($stockQty > 0);
+                $stockItem->setManageStock(1);
+                $stockItem->setUseConfigManageStock(0);
             }
 
             // --- Metadata attributes ---
