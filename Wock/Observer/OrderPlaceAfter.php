@@ -7,6 +7,7 @@ namespace DigitalWarehouse\Wock\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use DigitalWarehouse\Wock\Model\Config;
 use DigitalWarehouse\Wock\Model\WockOrderKey;
 use Psr\Log\LoggerInterface;
@@ -21,9 +22,10 @@ use Psr\Log\LoggerInterface;
 class OrderPlaceAfter implements ObserverInterface
 {
     public function __construct(
-        private readonly WockOrderKey    $wockOrderKey,
-        private readonly Config          $config,
-        private readonly LoggerInterface $logger,
+        private readonly WockOrderKey               $wockOrderKey,
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly Config                     $config,
+        private readonly LoggerInterface            $logger,
     ) {}
 
     public function execute(Observer $observer): void
@@ -49,8 +51,14 @@ class OrderPlaceAfter implements ObserverInterface
         $storeId      = (int) $order->getStoreId();
 
         foreach ($order->getAllVisibleItems() as $item) {
-            $product = $item->getProduct();
-            if (!$product) {
+            $productId = (int) $item->getProductId();
+            if (!$productId) {
+                continue;
+            }
+
+            try {
+                $product = $this->productRepository->getById($productId, false, $storeId);
+            } catch (\Exception $e) {
                 continue;
             }
 
