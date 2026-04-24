@@ -408,8 +408,12 @@ class KeyFulfillmentService
 
         $html = '';
         foreach (array_values($related) as $rp) {
-            $name       = htmlspecialchars((string) $rp->getName(), ENT_QUOTES, 'UTF-8');
-            $url        = htmlspecialchars($storeBase . $rp->getUrlKey() . '.html', ENT_QUOTES, 'UTF-8');
+            $name    = htmlspecialchars((string) $rp->getName(), ENT_QUOTES, 'UTF-8');
+            $rawUrl  = $storeBase . $rp->getUrlKey() . '.html';
+            // Whitelist http/https to prevent javascript: injection via crafted URL keys
+            $url     = preg_match('#^https?://#i', $rawUrl)
+                ? htmlspecialchars($rawUrl, ENT_QUOTES, 'UTF-8')
+                : htmlspecialchars($storeBase, ENT_QUOTES, 'UTF-8'); // fall back to store root
 
             // Thumbnail — use small_image or placeholder
             $imgFile    = $rp->getSmallImage();
