@@ -4,30 +4,40 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 $orderKeys = $block->getOrderKeys();
+$fetchUrl  = $block->getFetchKeyUrl();
+$sendUrl   = $block->getSendKeyUrl();
+$formKey   = $block->getFormKey();
 ?>
 
 <div class="wock-orders-grid-wrap">
     <?php if (!empty($orderKeys)): ?>
-        <table class="data-grid">
+        <table class="data-grid" id="wock-orders-table">
             <thead>
                 <tr>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Order #')) ?></span></th>
-                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Store / Website')) ?></span></th>
-                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product Name')) ?></span></th>
-                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK Product ID')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Store')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product')) ?></span></th>
+                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('WoCK ID')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Qty')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Product Key')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Status')) ?></span></th>
                     <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Created')) ?></span></th>
-                    <th class="data-grid-th"><span><?= $escaper->escapeHtml(__('Action')) ?></span></th>
+                    <th class="data-grid-th wock-th-actions"><span><?= $escaper->escapeHtml(__('Actions')) ?></span></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($orderKeys as $row): ?>
-                    <tr class="data-row">
+                    <?php
+                        $keyId    = (int) $row['key_id'];
+                        $hasError = !empty($row['error_message']);
+                        $statusClass = $block->getStatusClass($row['status'], $hasError);
+                        $statusLabel = $block->getStatusLabel($row['status'], $hasError);
+                        $isFulfilled = $row['status'] === 'fulfilled';
+                    ?>
+                    <tr class="data-row" id="wock-row-<?= $escaper->escapeHtmlAttr($keyId) ?>">
                         <td>
                             <a href="<?= $escaper->escapeUrl($block->getOrderViewUrl((int) $row['order_id'])) ?>"
-                               class="wock-link" title="<?= $escaper->escapeHtmlAttr(__('View Order')) ?>">
+                               class="wock-link">
                                 <?= $escaper->escapeHtml($row['order_increment_id']) ?>
                             </a>
                         </td>
@@ -35,20 +45,47 @@ $orderKeys = $block->getOrderKeys();
                         <td><?= $escaper->escapeHtml($row['product_name'] ?? '—') ?></td>
                         <td><strong><?= $escaper->escapeHtml((string) $row['wock_product_id']) ?></strong></td>
                         <td class="a-center"><?= $escaper->escapeHtml((string) $row['qty']) ?></td>
-                        <td class="wock-key-cell">
-                            <code class="wock-key-value"><?= $escaper->escapeHtml($row['product_key']) ?></code>
+
+                        <td class="wock-key-cell" id="wock-key-cell-<?= $escaper->escapeHtmlAttr($keyId) ?>">
+                            <?php if ($isFulfilled): ?>
+                                <?php foreach (explode("\n", $row['product_key']) as $singleKey): ?>
+                                    <code class="wock-key-value"><?= $escaper->escapeHtml(trim($singleKey)) ?></code>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <span class="wock-key-placeholder"><?= $escaper->escapeHtml($row['product_key']) ?></span>
+                            <?php endif; ?>
                         </td>
-                        <td>
-                            <span class="wock-status-badge <?= $escaper->escapeHtmlAttr($block->getStatusClass($row['status'])) ?>">
-                                <?= $escaper->escapeHtml(ucfirst($row['status'])) ?>
+
+                        <td id="wock-status-cell-<?= $escaper->escapeHtmlAttr($keyId) ?>">
+                            <span class="wock-status-badge <?= $escaper->escapeHtmlAttr($statusClass) ?>">
+                                <?= $escaper->escapeHtml($statusLabel) ?>
                             </span>
+                            <?php if ($hasError && !$isFulfilled): ?>
+                                <span class="wock-error-tip" title="<?= $escaper->escapeHtmlAttr($row['error_message']) ?>">&#9432;</span>
+                            <?php endif; ?>
                         </td>
+
                         <td><?= $escaper->escapeHtml($row['created_at'] ?? '') ?></td>
-                        <td>
-                            <a href="<?= $escaper->escapeUrl($block->getOrderViewUrl((int) $row['order_id'])) ?>"
-                               class="action-menu-item">
-                                <?= $escaper->escapeHtml(__('View Order')) ?>
-                            </a>
+
+                        <td class="wock-actions-cell" id="wock-actions-<?= $escaper->escapeHtmlAttr($keyId) ?>">
+                            <button type="button"
+                                    class="wock-btn wock-btn-fetch"
+                                    data-key-id="<?= $escaper->escapeHtmlAttr($keyId) ?>"
+                                    title="<?= $escaper->escapeHtmlAttr(__('Retrieve key from WoCK API and store it')) ?>">
+                                &#8615;&nbsp;<?= $escaper->escapeHtml(__('Fetch Key')) ?>
+                            </button>
+                            <button type="button"
+                                    class="<?= $escaper->escapeHtmlAttr('wock-btn wock-btn-send' . ($isFulfilled ? '' : ' wock-btn-disabled')) ?>"
+                                    data-key-id="<?= $escaper->escapeHtmlAttr($keyId) ?>"
+                                    <?php if (!$isFulfilled): ?>disabled="disabled"<?php endif; ?>
+                                    title="<?= $escaper->escapeHtmlAttr(__('Send stored key to customer by email')) ?>">
+                                &#9993;&nbsp;<?= $escaper->escapeHtml(__('Send Email')) ?>
+                            </button>
+                            <div class="wock-action-msg" id="wock-msg-<?= $escaper->escapeHtmlAttr($keyId) ?>">
+                                <?php if ($hasError && !$isFulfilled): ?>
+                                    <span class="wock-msg-err"><?= $escaper->escapeHtml($row['error_message']) ?></span>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -65,25 +102,156 @@ $orderKeys = $block->getOrderKeys();
 .wock-orders-grid-wrap { margin-top: 20px; border: 1px solid #d6d6d6; background-color: #fff; }
 .wock-orders-grid-wrap table { width: 100%; border-collapse: collapse; }
 .wock-orders-grid-wrap th,
-.wock-orders-grid-wrap th span { background: #f8f8f8; padding: 1.2rem 1rem; text-align: left; border-bottom: 2px solid #ccc; font-weight: 600; color: #000000 !important; }
-.wock-orders-grid-wrap td { padding: 1rem; border-bottom: 1px solid #e3e3e3; vertical-align: middle; color: #000000 !important; }
-.wock-orders-grid-wrap tr:hover td { background-color: #f5f5f5; }
+.wock-orders-grid-wrap th span { background: #f8f8f8; padding: 1.2rem 1rem; text-align: left; border-bottom: 2px solid #ccc; font-weight: 600; color: #000 !important; }
+.wock-orders-grid-wrap td { padding: .8rem 1rem; border-bottom: 1px solid #e3e3e3; vertical-align: middle; color: #000 !important; }
+.wock-orders-grid-wrap tr:hover td { background-color: #f9f9f9; }
 .wock-orders-grid-wrap .empty { padding: 2rem; }
 .wock-orders-grid-wrap .a-center { text-align: center; }
+.wock-th-actions { min-width: 220px; }
 
-/* Links */
-.wock-orders-grid-wrap .wock-link { color: #007bdb; text-decoration: none; font-weight: 600; }
-.wock-orders-grid-wrap .wock-link:hover { text-decoration: underline; color: #00599d; }
-.wock-orders-grid-wrap .action-menu-item { color: #007bdb; text-decoration: none; font-weight: 600; }
-.wock-orders-grid-wrap .action-menu-item:hover { text-decoration: underline; color: #00599d; }
+.wock-link { color: #007bdb; text-decoration: none; font-weight: 600; }
+.wock-link:hover { text-decoration: underline; }
 
-/* Key cell */
-.wock-key-cell { max-width: 280px; word-break: break-all; }
-.wock-key-value { background: #f4f4f4; border: 1px solid #ddd; padding: 3px 8px; border-radius: 3px; font-size: 12px; color: #333; }
+/* Key cell — each key on its own line */
+.wock-key-cell { max-width: 260px; }
+.wock-key-value { display: block; background: #f4f4f4; border: 1px solid #ddd; padding: 3px 8px; border-radius: 3px; font-size: 12px; color: #333; word-break: break-all; margin: 2px 0; }
+.wock-key-placeholder { font-size: 12px; color: #999; font-style: italic; }
 
 /* Status badges */
-.wock-status-badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.wock-status-pending   { background-color: #fff3cd; color: #856404; border: 1px solid #ffc107; }
-.wock-status-fulfilled { background-color: #d4edda; color: #155724; border: 1px solid #28a745; }
-.wock-status-error     { background-color: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+.wock-status-badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+.wock-status-pending   { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+.wock-status-retrying  { background: #fff0e0; color: #7d4e00; border: 1px solid #ff9800; }
+.wock-status-awaiting  { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+.wock-status-fulfilled { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+.wock-status-error     { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+
+/* Error tooltip icon */
+.wock-error-tip { display: inline-block; margin-left: 4px; color: #c0392b; cursor: help; font-size: 14px; }
+
+/* Action buttons */
+.wock-actions-cell { min-width: 220px; }
+.wock-btn { display: inline-block; margin: 2px 3px 2px 0; padding: 5px 10px; font-size: 12px; font-weight: 600; border-radius: 3px; cursor: pointer; border: 1px solid; transition: opacity .15s; }
+.wock-btn-fetch  { background: #e8f4fd; color: #0066cc; border-color: #b8daff; }
+.wock-btn-fetch:hover:not(:disabled)  { background: #cce5ff; }
+.wock-btn-send   { background: #e8f8ee; color: #155724; border-color: #c3e6cb; }
+.wock-btn-send:hover:not(:disabled)   { background: #d4edda; }
+.wock-btn-disabled, .wock-btn:disabled { opacity: .45; cursor: not-allowed; }
+.wock-btn-loading { opacity: .6; cursor: wait; }
+
+.wock-action-msg { font-size: 11px; margin-top: 4px; min-height: 14px; line-height: 1.4; max-width: 240px; word-break: break-word; }
+.wock-msg-ok   { color: #155724; }
+.wock-msg-err  { color: #721c24; }
+.wock-msg-info { color: #004085; }
 </style>
+
+<script>
+(function () {
+    var FETCH_URL = '<?= $escaper->escapeJs($fetchUrl) ?>';
+    var SEND_URL  = '<?= $escaper->escapeJs($sendUrl) ?>';
+    var FORM_KEY  = '<?= $escaper->escapeJs($formKey) ?>';
+
+    function setMsg(keyId, text, type) {
+        var el = document.getElementById('wock-msg-' + keyId);
+        if (!el) return;
+        el.innerHTML = '<span class="wock-msg-' + (type || 'info') + '">' + escHtml(text) + '</span>';
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function setStatus(keyId, label, cssClass) {
+        var cell = document.getElementById('wock-status-cell-' + keyId);
+        if (!cell) return;
+        cell.innerHTML = '<span class="wock-status-badge ' + cssClass + '">' + escHtml(label) + '</span>';
+    }
+
+    function setKeyCell(keyId, keyText) {
+        var cell = document.getElementById('wock-key-cell-' + keyId);
+        if (!cell) return;
+        // Render each newline-separated key as its own <code> block
+        var lines = keyText.split('\n').filter(function(l){ return l.trim() !== ''; });
+        cell.innerHTML = lines.map(function(k) {
+            return '<code class="wock-key-value">' + escHtml(k.trim()) + '</code>';
+        }).join('');
+    }
+
+    function enableSendBtn(keyId) {
+        var div = document.getElementById('wock-actions-' + keyId);
+        if (!div) return;
+        var btn = div.querySelector('.wock-btn-send');
+        if (!btn) return;
+        btn.disabled = false;
+        btn.classList.remove('wock-btn-disabled');
+    }
+
+    function postAjax(url, params, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.onload = function () {
+            try { callback(null, JSON.parse(xhr.responseText)); }
+            catch (e) { callback('Invalid response from server.'); }
+        };
+        xhr.onerror = function () { callback('Network error.'); };
+        var body = 'form_key=' + encodeURIComponent(FORM_KEY);
+        Object.keys(params).forEach(function (k) {
+            body += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+        });
+        xhr.send(body);
+    }
+
+    // ── Fetch Key ────────────────────────────────────────────────────────
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.wock-btn-fetch');
+        if (!btn || btn.disabled) return;
+        var keyId = btn.dataset.keyId;
+        btn.disabled = true;
+        btn.classList.add('wock-btn-loading');
+        setMsg(keyId, 'Contacting WoCK API\u2026', 'info');
+
+        postAjax(FETCH_URL, { key_id: keyId }, function (err, data) {
+            btn.disabled = false;
+            btn.classList.remove('wock-btn-loading');
+            if (err || !data) { setMsg(keyId, err || 'Unknown error.', 'err'); return; }
+
+            if (data.success) {
+                var count = data.key_count || 1;
+                setMsg(keyId, '\u2713 ' + count + ' key' + (count !== 1 ? 's' : '') + ' retrieved.', 'ok');
+                setKeyCell(keyId, data.key);
+                setStatus(keyId, 'Fulfilled', 'wock-status-badge wock-status-fulfilled');
+                enableSendBtn(keyId);
+            } else {
+                var notReady = data.message && data.message.indexOf('not ready') !== -1;
+                setMsg(keyId, (notReady ? '\u23f3 ' : '\u2717 ') + (data.message || 'Failed.'), notReady ? 'info' : 'err');
+            }
+        });
+    });
+
+    // ── Send Email ────────────────────────────────────────────────────────
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.wock-btn-send');
+        if (!btn || btn.disabled) return;
+        var keyId = btn.dataset.keyId;
+        if (!confirm('Send product key for this row to the customer now?')) return;
+
+        btn.disabled = true;
+        btn.classList.add('wock-btn-loading');
+        setMsg(keyId, 'Sending email\u2026', 'info');
+
+        postAjax(SEND_URL, { key_id: keyId }, function (err, data) {
+            btn.disabled = false;
+            btn.classList.remove('wock-btn-loading');
+            if (err || !data) { setMsg(keyId, err || 'Unknown error.', 'err'); return; }
+            if (data.success) {
+                setMsg(keyId, '\u2713 Email sent to customer.', 'ok');
+            } else {
+                setMsg(keyId, '\u2717 ' + (data.message || 'Send failed.'), 'err');
+            }
+        });
+    });
+}());
+</script>

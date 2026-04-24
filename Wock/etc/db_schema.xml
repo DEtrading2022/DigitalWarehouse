@@ -57,10 +57,11 @@
         <column xsi:type="varchar"   name="product_name"          nullable="true"  length="255"  comment="Magento product name snapshot"/>
         <column xsi:type="int"       name="wock_product_id"       unsigned="true" nullable="false" comment="WoCK product ID"/>
         <column xsi:type="smallint"  name="qty"                   unsigned="true" nullable="false" default="1" comment="Ordered quantity"/>
-        <column xsi:type="varchar"   name="product_key"           nullable="false" length="512"  comment="Product key (placeholder or actual)"/>
+        <column xsi:type="text"      name="product_key"           nullable="false"  comment="Product key (placeholder or actual)"/>
         <column xsi:type="varchar"   name="wock_order_id"         nullable="true"  length="36"   comment="WoCK order UUID (once placed)"/>
         <column xsi:type="smallint"  name="store_id"              unsigned="true" nullable="false" default="0" comment="Magento store ID"/>
-        <column xsi:type="varchar"   name="status"                nullable="false" length="24"   default="pending" comment="pending | fulfilled | error"/>
+        <column xsi:type="varchar"   name="status"                nullable="false" length="24"   default="pending" comment="pending | awaiting_delivery | fulfilled | error"/>
+        <column xsi:type="text"      name="error_message"         nullable="true"                comment="Last error from WoCK API (createOrder failures); NULL when no error"/>
         <column xsi:type="timestamp" name="created_at"            nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
         <column xsi:type="timestamp" name="updated_at"            nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

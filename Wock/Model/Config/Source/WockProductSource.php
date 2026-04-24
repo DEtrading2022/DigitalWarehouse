@@ -76,7 +76,7 @@ class WockProductSource extends AbstractSource
                 }
             }
         } catch (\Exception $e) {
-            $options[] = ['value' => '', 'label' => 'API Error: ' . $e->getMessage()];
+            $options[] = ['value' => '', 'label' => 'API Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')];
         }
 
         $this->options = $options;

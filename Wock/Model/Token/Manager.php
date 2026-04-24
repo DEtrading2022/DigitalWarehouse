@@ -9,6 +9,7 @@ use DigitalWarehouse\Wock\Exception\AuthenticationException;
 use DigitalWarehouse\Wock\Model\Config;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\HTTP\Client\CurlFactory;
+use Magento\Framework\Serialize\Serializer\Json;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -25,6 +26,7 @@ class Manager implements TokenManagerInterface
         private readonly Config          $config,
         private readonly CurlFactory     $curlFactory,
         private readonly CacheInterface  $cache,
+        private readonly Json            $json,
         private readonly LoggerInterface $logger,
     ) {}
 
@@ -82,24 +84,30 @@ class Manager implements TokenManagerInterface
         }
 
         if ($statusCode !== 200) {
+            // Do not log $body — it may contain Azure AD error details with correlation IDs
             $this->logger->error('WoCK token request failed', [
                 'status' => $statusCode,
-                'body'   => $body,
             ]);
             throw new AuthenticationException(
                 __('WoCK: Token endpoint returned HTTP %1. Check credentials.', $statusCode)
             );
         }
 
-        $data = json_decode($body, true);
+        try {
+            $data = $this->json->unserialize($body);
+        } catch (\InvalidArgumentException $e) {
+            $this->logger->error('WoCK token response was not valid JSON (body omitted for security)');
+            throw new AuthenticationException(__('WoCK: Token endpoint returned a non-JSON response.'));
+        }
+
         if (empty($data['access_token'])) {
-            $this->logger->error('WoCK token response missing access_token', ['body' => $body]);
+            $this->logger->error('WoCK token response missing access_token (body omitted for security)');
             throw new AuthenticationException(__('WoCK: Token response did not contain an access_token.'));
         }
 
-        $token  = $data['access_token'];
+        $token = $data['access_token'];
         // Cache slightly below the actual TTL to avoid racing against expiry
-        $ttl    = $this->config->getTokenTtl();
+        $ttl   = $this->config->getTokenTtl();
         $this->cache->save($token, self::CACHE_KEY, [], $ttl);
 
         $this->logger->debug('WoCK access token refreshed', ['ttl' => $ttl]);

@@ -108,8 +108,14 @@ abstract class AbstractWebhook implements HttpPostActionInterface, CsrfAwareActi
         $headerName  = $this->config->getWebhookSecretHeaderName();
         $headerValue = $this->config->getWebhookSecretHeaderValue();
 
-        // If no secret is configured, allow all requests
+        // If no secret is configured, allow all requests — but warn loudly so the
+        // operator knows the endpoint is open. Configure wock/webhook/secret_header_name
+        // and wock/webhook/secret_header_value in System > Configuration to lock it down.
         if (empty($headerName) || empty($headerValue)) {
+            $this->logger->warning('WoCK webhook: no secret configured — endpoint is open to anyone', [
+                'action' => static::class,
+                'ip'     => $this->request->getClientIp(),
+            ]);
             return true;
         }
 

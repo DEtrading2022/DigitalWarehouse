@@ -40,6 +40,7 @@
         "updated_at": true,
         "WOCK_ORDER_KEYS_ORDER_ID": true,
         "WOCK_ORDER_KEYS_STATUS": true,
-        "WOCK_ORDER_KEYS_WOCK_PRODUCT_ID": true
+        "WOCK_ORDER_KEYS_WOCK_PRODUCT_ID": true,
+        "error_message": true
     }
 }

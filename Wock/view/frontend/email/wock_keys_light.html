@@ -1,0 +1,342 @@
+<!--@subject 🎮 Your Game Keys Are Ready – Order #{{var increment_id}} @-->
+<!--@vars
+{
+    "var increment_id":"Order Number",
+    "var customer_name":"Customer Name",
+    "var keys_html":"Product Keys HTML (pre-escaped rows)",
+    "var related_products_html":"Related Products HTML (pre-built rows)",
+    "var store.getFrontendName()":"Store Name"
+}
+@-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Your Game Keys – Order #{{var increment_id}}</title>
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<![endif]-->
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+table,td{mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;}
+img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none;}
+a{text-decoration:none;}
+@media only screen and (max-width:620px){
+  .email-container{width:100%!important;min-width:100%!important;}
+  .rp-cell{display:block!important;width:100%!important;padding-bottom:16px!important;}
+  .rp-img{width:100%!important;height:auto!important;}
+  .pad-mobile{padding:24px 16px!important;}
+  .key-mono{font-size:13px!important;letter-spacing:1px!important;}
+  .hero-title{font-size:24px!important;}
+}
+</style>
+</head>
+
+<!-- outer bg: soft off-white blue-grey -->
+<body style="margin:0;padding:0;background-color:#eef2f7;">
+
+<!-- Preheader -->
+<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#eef2f7;mso-hide:all;">
+    Your game keys for order #{{var increment_id}} are ready to use. Redeem now!&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌
+</div>
+
+<!-- Outer wrapper -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+       style="background-color:#eef2f7;">
+<tr><td align="center" style="padding:32px 16px 0;">
+
+  <!-- Container: white -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"
+         class="email-container"
+         style="max-width:600px;width:100%;background-color:#ffffff;
+                border-radius:12px;overflow:hidden;border:1px solid #dde4ee;">
+
+    <!-- ── HERO (kept dark — contrast accent banner) ── -->
+    <tr>
+      <td style="padding:0;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td align="center"
+              style="padding:40px 32px 36px;
+                     background-color:#0a0a18;
+                     border-bottom:3px solid #00d4ff;">
+
+            <!-- Brand pill -->
+            <div style="display:inline-block;padding:7px 18px;
+                        background:rgba(0,212,255,0.1);
+                        border:1px solid rgba(0,212,255,0.28);
+                        border-radius:6px;
+                        font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                        font-size:13px;font-weight:700;
+                        letter-spacing:3px;text-transform:uppercase;
+                        color:#00d4ff;margin-bottom:22px;">
+              &#9654; {{var store.getFrontendName()}}
+            </div>
+
+            <!-- Hero icon -->
+            <div style="font-size:48px;line-height:1;margin-bottom:16px;">🎮</div>
+
+            <!-- Headline -->
+            <h1 class="hero-title"
+                style="margin:0 0 10px;
+                       font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                       font-size:30px;font-weight:800;line-height:1.2;
+                       color:#ffffff;letter-spacing:-0.5px;">
+              Your Keys Are Ready!
+            </h1>
+            <p style="margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                      font-size:15px;color:#7c8db5;line-height:1.5;">
+              Order
+              <span style="color:#00d4ff;font-weight:700;">#{{var increment_id}}</span>
+              has been fulfilled
+            </p>
+
+            <!-- Accent divider -->
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0"
+                   width="60" style="margin:20px auto 0;">
+            <tr><td height="2" style="background-color:#00d4ff;border-radius:1px;
+                                      font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+
+          </td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- ── GREETING ── -->
+    <tr>
+      <td class="pad-mobile" style="padding:32px 40px 0;">
+        <p style="margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                  font-size:15px;color:#475569;line-height:1.7;">
+          Hey <strong style="color:#1e293b;">{{var customer_name}}</strong>,
+        </p>
+        <p style="margin:10px 0 0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                  font-size:15px;color:#475569;line-height:1.7;">
+          Great news — your digital product keys are ready to redeem.
+          Keep them safe and activate them via your platform's redemption portal.
+        </p>
+      </td>
+    </tr>
+
+    <!-- ── PRODUCT KEYS ── -->
+    <tr>
+      <td class="pad-mobile" style="padding:28px 40px 0;">
+
+        <!-- Section label -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="margin-bottom:14px;">
+        <tr>
+          <td style="border-left:3px solid #0e9ab0;padding-left:12px;">
+            <span style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                         font-size:11px;font-weight:700;letter-spacing:2px;
+                         text-transform:uppercase;color:#0e9ab0;">
+              Your Product Keys
+            </span>
+          </td>
+        </tr>
+        </table>
+
+        <!-- Keys card -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="background-color:#f8fafc;border:1px solid #e2e8f0;
+                      border-radius:8px;overflow:hidden;">
+
+          <!-- Header row -->
+          <tr style="background-color:#f1f5f9;">
+            <td style="padding:10px 16px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                       font-size:11px;font-weight:700;letter-spacing:1.5px;
+                       text-transform:uppercase;color:#94a3b8;
+                       border-bottom:1px solid #e2e8f0;width:40%;">Product</td>
+            <td style="padding:10px 10px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                       font-size:11px;font-weight:700;letter-spacing:1.5px;
+                       text-transform:uppercase;color:#94a3b8;
+                       border-bottom:1px solid #e2e8f0;width:8%;text-align:center;">Qty</td>
+            <td style="padding:10px 16px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                       font-size:11px;font-weight:700;letter-spacing:1.5px;
+                       text-transform:uppercase;color:#94a3b8;
+                       border-bottom:1px solid #e2e8f0;">Activation Key</td>
+          </tr>
+
+          <!-- Dynamic key rows -->
+          {{var keys_html|raw}}
+
+        </table>
+
+      </td>
+    </tr>
+
+    <!-- ── PRO TIP ── -->
+    <tr>
+      <td class="pad-mobile" style="padding:14px 40px 0;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="background-color:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;">
+        <tr>
+          <td style="padding:13px 16px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                     font-size:13px;color:#0369a1;line-height:1.6;">
+            <strong style="color:#0284c7;">&#9432; Pro tip:</strong>
+            Copy your key carefully — including dashes. Keys are case-sensitive.
+            Once activated they cannot be transferred or refunded.
+          </td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- ── ORDER DETAILS ── -->
+    <tr>
+      <td class="pad-mobile" style="padding:28px 40px 0;">
+
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="margin-bottom:14px;">
+        <tr>
+          <td style="border-left:3px solid #7c3aed;padding-left:12px;">
+            <span style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                         font-size:11px;font-weight:700;letter-spacing:2px;
+                         text-transform:uppercase;color:#7c3aed;">Order Details</span>
+          </td>
+        </tr>
+        </table>
+
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="background-color:#fafafa;border:1px solid #e2e8f0;
+                      border-radius:8px;overflow:hidden;">
+          <tr>
+            <td style="padding:15px 20px;border-bottom:1px solid #e9eef5;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                           font-size:13px;color:#94a3b8;">Order Number</td>
+                <td align="right"
+                    style="font-family:'Courier New',Courier,monospace;
+                           font-size:14px;font-weight:700;color:#0e7490;">
+                  #{{var increment_id}}
+                </td>
+              </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:15px 20px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                           font-size:13px;color:#94a3b8;">Delivery Status</td>
+                <td align="right">
+                  <span style="display:inline-block;padding:3px 12px;
+                               background-color:#ecfeff;
+                               border:1px solid #a5f3fc;
+                               border-radius:20px;
+                               font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                               font-size:11px;font-weight:700;
+                               letter-spacing:1px;text-transform:uppercase;
+                               color:#0e7490;">
+                    ✓ Fulfilled
+                  </span>
+                </td>
+              </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+
+    <!-- ── RELATED PRODUCTS ── -->
+    {{depend related_products_html}}
+    <tr>
+      <td class="pad-mobile" style="padding:28px 40px 0;">
+
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="margin-bottom:16px;">
+        <tr>
+          <td style="border-left:3px solid #f59e0b;padding-left:12px;">
+            <span style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                         font-size:11px;font-weight:700;letter-spacing:2px;
+                         text-transform:uppercase;color:#d97706;">
+              You Might Also Like
+            </span>
+          </td>
+        </tr>
+        </table>
+
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>{{var related_products_html|raw}}</tr>
+        </table>
+
+      </td>
+    </tr>
+    {{/depend}}
+
+    <!-- ── CTA ── -->
+    <tr>
+      <td align="center" class="pad-mobile" style="padding:32px 40px;">
+        <!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                     href="{{var store.getBaseUrl()}}sales/order/view/order_id/{{var order.getId()}}/"
+                     style="height:46px;v-text-anchor:middle;width:180px;"
+                     arcsize="13%" stroke="f" fillcolor="#0e7490">
+          <w:anchorlock/>
+          <center style="color:#ffffff;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;">View My Order</center>
+        </v:roundrect>
+        <![endif]-->
+        <!--[if !mso]><!-->
+        <a href="{{var store.getBaseUrl()}}sales/order/view/order_id/{{var order.getId()}}/"
+           style="display:inline-block;padding:14px 38px;
+                  background-color:#0e7490;
+                  border-radius:6px;
+                  font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                  font-size:14px;font-weight:700;letter-spacing:0.5px;
+                  color:#ffffff;text-decoration:none;">
+          View My Order
+        </a>
+        <!--<![endif]-->
+      </td>
+    </tr>
+
+    <!-- ── FOOTER ── -->
+    <tr>
+      <td style="background-color:#f8fafc;border-top:1px solid #e2e8f0;padding:26px 40px 30px;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td align="center">
+            <p style="margin:0 0 6px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                      font-size:13px;font-weight:700;color:#94a3b8;
+                      letter-spacing:2px;text-transform:uppercase;">
+              {{var store.getFrontendName()}}
+            </p>
+            <p style="margin:0 0 12px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                      font-size:11px;color:#cbd5e1;line-height:1.6;">
+              This email was sent to confirm your digital product key delivery.
+              Keys are non-transferable and non-refundable once activated.
+            </p>
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0"
+                   width="40" style="margin:0 auto 12px;">
+            <tr><td height="1" style="background-color:#e2e8f0;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+            <p style="margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;
+                      font-size:11px;color:#cbd5e1;">
+              Questions?
+              <a href="{{var store.getBaseUrl()}}contact"
+                 style="color:#0e7490;text-decoration:underline;">Contact Support</a>
+            </p>
+          </td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+
+  </table>
+
+</td></tr>
+<tr><td style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+
+</body>
+</html>

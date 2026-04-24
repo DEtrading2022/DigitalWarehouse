@@ -66,7 +66,7 @@ $currentPage = $block->getCurrentPage();
                 </thead>
                 <tbody>
                     <?php foreach ($items as $item): ?>
-                        <tr class="data-row <?= $item['isDisabled'] ? 'wock-row-disabled' : '' ?>">
+                        <tr class="data-row <?= $escaper->escapeHtmlAttr($item['isDisabled'] ? 'wock-row-disabled' : '') ?>">
                             <td><strong><?= $escaper->escapeHtml($item['id']) ?></strong></td>
                             <td class="wock-title"><?= $escaper->escapeHtml($item['name']) ?></td>
                             <td><?= $escaper->escapeHtml($item['quantity']['all'] ?? 0) ?></td>

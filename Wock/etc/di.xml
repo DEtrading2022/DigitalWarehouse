@@ -110,4 +110,20 @@
         </arguments>
     </type>
 
+
+    <type name="DigitalWarehouse\Wock\Model\KeyFulfillmentService">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Controller\Adminhtml\Orders\FetchKey">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
+    <type name="DigitalWarehouse\Wock\Controller\Adminhtml\Orders\SendKey">
+        <arguments>
+            <argument name="logger" xsi:type="object">DigitalWarehouse\Wock\Helper\Logger</argument>
+        </arguments>
+    </type>
 </config>
