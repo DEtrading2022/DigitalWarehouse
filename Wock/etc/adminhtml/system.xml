@@ -107,7 +107,7 @@
                 </field>
                 <field id="key_email_template" translate="label comment" type="select" sortOrder="20" showInDefault="1">
                     <label>Product Keys Email Template</label>
-                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <source_model>DigitalWarehouse\Wock\Model\Config\Source\EmailTemplate</source_model>
                     <comment>Email template used to send product keys to the customer.</comment>
                 </field>
             </group>
