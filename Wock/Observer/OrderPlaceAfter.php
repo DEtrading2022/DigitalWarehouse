@@ -30,7 +30,10 @@ class OrderPlaceAfter implements ObserverInterface
 
     public function execute(Observer $observer): void
     {
+        $this->logger->debug('WoCK OrderPlaceAfter: observer fired');
+
         if (!$this->config->isEnabled()) {
+            $this->logger->debug('WoCK OrderPlaceAfter: SKIPPED — module is disabled in config');
             return;
         }
 
@@ -38,37 +41,72 @@ class OrderPlaceAfter implements ObserverInterface
         $order = $observer->getEvent()->getOrder();
 
         if (!$order || !$order->getId()) {
+            $this->logger->debug('WoCK OrderPlaceAfter: SKIPPED — no order on event');
             return;
         }
+
+        $orderId     = (int) $order->getId();
+        $incrementId = $order->getIncrementId();
+        $storeId     = (int) $order->getStoreId();
+
+        $this->logger->debug('WoCK OrderPlaceAfter: processing order', [
+            'order_id'     => $orderId,
+            'increment_id' => $incrementId,
+            'store_id'     => $storeId,
+        ]);
 
         // Avoid duplicate rows if the observer fires more than once
-        if ($this->wockOrderKey->hasRowsForOrder((int) $order->getId())) {
+        if ($this->wockOrderKey->hasRowsForOrder($orderId)) {
+            $this->logger->debug('WoCK OrderPlaceAfter: SKIPPED — rows already exist for order', [
+                'order_id' => $orderId,
+            ]);
             return;
         }
 
-        $orderId      = (int) $order->getId();
-        $incrementId  = $order->getIncrementId();
-        $storeId      = (int) $order->getStoreId();
+        $itemCount = count($order->getAllVisibleItems());
+        $this->logger->debug('WoCK OrderPlaceAfter: iterating items', ['item_count' => $itemCount]);
 
         foreach ($order->getAllVisibleItems() as $item) {
             $productId = (int) $item->getProductId();
+
             if (!$productId) {
+                $this->logger->debug('WoCK OrderPlaceAfter: item skipped — no product ID', [
+                    'item_id' => $item->getItemId(),
+                ]);
                 continue;
             }
 
             try {
                 $product = $this->productRepository->getById($productId, false, $storeId);
             } catch (\Exception $e) {
+                $this->logger->warning('WoCK OrderPlaceAfter: could not load product', [
+                    'product_id' => $productId,
+                    'error'      => $e->getMessage(),
+                ]);
                 continue;
             }
+
+            $isWock       = (int) $product->getData('is_wock_product');
+            $wockProductId = (int) $product->getData('wock_product_id');
+
+            $this->logger->debug('WoCK OrderPlaceAfter: product attribute check', [
+                'product_id'     => $productId,
+                'is_wock_product' => $isWock,
+                'wock_product_id' => $wockProductId,
+            ]);
 
             // Only process items flagged as WoCK products
-            if (!(int) $product->getData('is_wock_product')) {
+            if (!$isWock) {
+                $this->logger->debug('WoCK OrderPlaceAfter: item skipped — is_wock_product is not set', [
+                    'product_id' => $productId,
+                ]);
                 continue;
             }
 
-            $wockProductId = (int) $product->getData('wock_product_id');
             if (!$wockProductId) {
+                $this->logger->warning('WoCK OrderPlaceAfter: item skipped — wock_product_id is empty/zero', [
+                    'product_id' => $productId,
+                ]);
                 continue;
             }
 
@@ -87,9 +125,9 @@ class OrderPlaceAfter implements ObserverInterface
                 );
 
                 $this->logger->info('WoCK OrderPlaceAfter: placeholder created', [
-                    'order'          => $incrementId,
+                    'order'           => $incrementId,
                     'wock_product_id' => $wockProductId,
-                    'qty'            => $qty,
+                    'qty'             => $qty,
                 ]);
             } catch (\Exception $e) {
                 $this->logger->error('WoCK OrderPlaceAfter: failed to create placeholder', [
