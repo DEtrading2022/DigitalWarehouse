@@ -12,8 +12,14 @@
                   instance="DigitalWarehouse\Wock\Observer\DeliveryWebhookObserver"/>
     </event>
     <!-- Create placeholder WoCK keys when a Magento order is placed -->
+    <!-- sales_order_place_after fires for most flows but can miss the order in admin context -->
     <event name="sales_order_place_after">
         <observer name="wock_order_place_after"
+                  instance="DigitalWarehouse\Wock\Observer\OrderPlaceAfter"/>
+    </event>
+    <!-- checkout_submit_all_after is the reliable fallback: fires for both frontend and admin orders -->
+    <event name="checkout_submit_all_after">
+        <observer name="wock_checkout_submit_all_after"
                   instance="DigitalWarehouse\Wock\Observer\OrderPlaceAfter"/>
     </event>
     <!-- Fulfill WoCK keys when order status reaches configured fulfillment status -->
