@@ -312,15 +312,45 @@ class KeyFulfillmentService
             $keyLines  = array_filter(array_map('trim', explode("\n", (string) $keyData['product_key'])));
             // Neutral teal palette — readable on both dark-navy and white email backgrounds
             $keyBlocks = implode('', array_map(
-                static fn(string $k) => '<div style="margin:4px 0;">'
-                    . '<code class="key-mono" style="display:block;'
-                    . 'font-family:\'Courier New\',Courier,monospace;'
-                    . 'font-size:15px;font-weight:700;letter-spacing:2px;'
-                    . 'color:#0c7a8a;background:#e8f9fc;'
-                    . 'border:1px solid #a5e8f2;'
-                    . 'border-radius:4px;padding:8px 12px;word-break:break-all;">'
-                    . htmlspecialchars($k, ENT_QUOTES, 'UTF-8')
-                    . '</code></div>',
+                static function (string $k): string {
+                    // Archive download URL → clickable button
+                    if (preg_match('#^https?://#i', $k)) {
+                        $safeUrl  = htmlspecialchars($k, ENT_QUOTES, 'UTF-8');
+                        return '<div style="margin:6px 0;">'
+                            . '<a href="' . $safeUrl . '" '
+                            . 'style="display:inline-block;padding:9px 18px;'
+                            . 'background:#0c7a8a;color:#ffffff;'
+                            . 'font-family:\'Segoe UI\',Helvetica,Arial,sans-serif;'
+                            . 'font-size:13px;font-weight:700;border-radius:4px;'
+                            . 'text-decoration:none;word-break:break-all;">'
+                            . '&#8659; Download Archive'
+                            . '</a>'
+                            . '<div style="margin-top:4px;font-family:\'Segoe UI\',Helvetica,Arial,sans-serif;'
+                            . 'font-size:10px;color:#64748b;word-break:break-all;">' . $safeUrl . '</div>'
+                            . '</div>';
+                    }
+                    // Password line → lock-icon styled badge
+                    if (stripos($k, 'Password:') === 0) {
+                        $label = htmlspecialchars(substr($k, 9), ENT_QUOTES, 'UTF-8');
+                        return '<div style="margin:6px 0;">'
+                            . '<span style="display:inline-block;padding:6px 12px;'
+                            . 'background:#fef3c7;border:1px solid #f59e0b;'
+                            . 'border-radius:4px;font-family:\'Courier New\',Courier,monospace;'
+                            . 'font-size:14px;font-weight:700;color:#92400e;word-break:break-all;">'
+                            . '&#128274; Password:&nbsp;' . trim($label)
+                            . '</span></div>';
+                    }
+                    // Plain game key → standard monospace code block
+                    return '<div style="margin:4px 0;">'
+                        . '<code style="display:block;'
+                        . 'font-family:\'Courier New\',Courier,monospace;'
+                        . 'font-size:15px;font-weight:700;letter-spacing:2px;'
+                        . 'color:#0c7a8a;background:#e8f9fc;'
+                        . 'border:1px solid #a5e8f2;'
+                        . 'border-radius:4px;padding:8px 12px;word-break:break-all;">'
+                        . htmlspecialchars($k, ENT_QUOTES, 'UTF-8')
+                        . '</code></div>';
+                },
                 $keyLines
             ));
 
