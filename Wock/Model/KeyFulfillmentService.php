@@ -79,8 +79,22 @@ class KeyFulfillmentService
         try {
             $delivery = $this->deliveryService->getDelivery($wockOrderId);
         } catch (ApiException $e) {
-            $this->wockOrderKey->markError($keyId, 'Delivery fetch failed: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Delivery fetch failed: ' . $e->getMessage()];
+            $msg = $e->getMessage();
+            // WoCK returns "Internal error" when the order is still being processed.
+            // Treat this as transient — keep awaiting_delivery so cron can retry.
+            if (stripos($msg, 'internal error') !== false) {
+                $this->logger->warning('WoCK KeyFulfillmentService: WoCK internal error on delivery — will retry', [
+                    'key_id'        => $keyId,
+                    'wock_order_id' => $wockOrderId,
+                ]);
+                return [
+                    'success' => false,
+                    'message' => 'Delivery not ready yet — WoCK is still processing. Try again in a few seconds.',
+                ];
+            }
+            // Any other API error (auth, network, schema) is a real failure
+            $this->wockOrderKey->markError($keyId, 'Delivery fetch failed: ' . $msg);
+            return ['success' => false, 'message' => 'Delivery fetch failed: ' . $msg];
         }
 
         $ready = $delivery['status']['ready'] ?? false;
@@ -100,6 +114,8 @@ class KeyFulfillmentService
 
         // ── Step 3: extract and store keys ────────────────────────────────
         $keyStrings = [];
+
+        // Plain-text keys from products (most common)
         foreach ($delivery['products'] ?? [] as $dp) {
             foreach ($dp['keys'] ?? [] as $keyData) {
                 $value = trim((string) ($keyData['key'] ?? ''));
@@ -109,9 +125,22 @@ class KeyFulfillmentService
             }
         }
 
+        // Archive / ZIP delivery fallback — WoCK sends encrypted ZIPs with a password.
+        // Store the download link and password so admin/customer email contains them.
         if (empty($keyStrings)) {
-            return ['success' => false, 'message' => 'Delivery was ready but contained no keys.'];
+            foreach ($delivery['archives'] ?? [] as $archive) {
+                $link     = trim((string) ($archive['link'] ?? ''));
+                $password = trim((string) ($archive['password'] ?? ''));
+                if ($link !== '') {
+                    $keyStrings[] = $link . ($password !== '' ? "\nPassword: " . $password : '');
+                }
+            }
         }
+
+        if (empty($keyStrings)) {
+            return ['success' => false, 'message' => 'Delivery was ready but contained no keys or archives.'];
+        }
+
 
         $productKey = implode("\n", $keyStrings);
         $this->wockOrderKey->fulfill($keyId, $productKey, $wockOrderId);
