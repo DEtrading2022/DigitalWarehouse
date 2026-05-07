@@ -68,6 +68,25 @@ class KeyFulfillmentService
         $wockOrderId = (string) ($keyRow['wock_order_id'] ?? '');
 
         if (empty($wockOrderId)) {
+            // Refuse to place order if Magento order hasn't reached the fulfillment status (i.e. not yet paid/complete)
+            $fulfillmentStatus = $this->config->getOrderFulfillmentStatus();
+            if (!empty($fulfillmentStatus)) {
+                try {
+                    $order = $this->orderRepository->get($orderId);
+                    if ($order->getStatus() !== $fulfillmentStatus) {
+                        return [
+                            'success' => false,
+                            'message' => 'Cannot fetch key: Magento order must be in "' . $fulfillmentStatus . '" status first (currently "' . $order->getStatus() . '").'
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    return [
+                        'success' => false,
+                        'message' => 'Could not load Magento order to verify fulfillment status.'
+                    ];
+                }
+            }
+
             $placeResult = $this->placeWockOrder($keyRow);
             if (!$placeResult['success']) {
                 return $placeResult;
